@@ -1,0 +1,39 @@
+# CMake
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
+Makefile
+install_manifest.txt
+
+# Compiled binaries
+*.so
+*.dylib
+*.dll
+*.exe
+
+# Object files
+*.o
+*.obj
+
+# Executables
+out/
+bin/
+
+# Visual Studio Code specific files
+.vscode/
+
+# Xcode specific files
+*.xcodeproj/
+*.xcworkspace/
+
+# Sublime Text specific files
+*.sublime-workspace
+*.sublime-project
+
+# Intellij IDEA
+.idea/
+
+# Build directory
+build/
+
