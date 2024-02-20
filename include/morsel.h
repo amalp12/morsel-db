@@ -1,33 +1,49 @@
-#include <string>
-#include <list>
+#pragma once
+#include <vector>
 #include <memory>
+#include <string>
+#include "attribute.h"
+#include <vector>
+#include <cstring>
 
-class Morsel{
+class Morsel {
 
-    private:
-        std::string subOperator;
-        std::list<std::string> argList;
-        Morsel * next;
-        int size;
-        int entrySize;
-        void * startPtr;
-        void * endPtr;
-        void * currentPtr;
-    
-    public:
-        Morsel(int morselSize, int morselEntrySize);
-        std::string getSubOperator();
-        std::list<std::string> getArgList();
-        Morsel* getNext();
+private:
+  Morsel *next;
+  int size;
+  int entrySize;
+  void *startPtr;
+  int nextFreeIndex;
+  int filledEntries;
+  int setNthMorselEntry(int n, void *ptr);
+  int setNthMorselEntry(int n, void *ptr , std::vector<Attribute> attributeList);
+  int setNext(Morsel *nextPtr);
 
-        int setSubOperator(std::string  op);
-        int setArgList(std::list<std::string>  argumentsList);
-        int setNext(Morsel * nextPtr);
-        int setCurrentPtr(void * ptr);
-        int setNthMorsel(int n, void * ptr);
+public:
+  void *getNthMorselEntry(int n);
+  void *getStartPtr();
+  Morsel(int morselSize, int morselEntrySize);
+  Morsel *getNext();
+  int insertEntry(void *entry);
+  int insertEntry(void *entry , std::vector<Attribute> attributeList);
 
-        void * getStartPtr();
-        void * getEndPtr();
-        void * getCurrentPtr();
-        void * getNthMorsel(int n);
+  int getTotalSize();
+  int getEntrySize();
+  int getTotalNumberOfEntries();
+  int getFilledNumberOfEntries();
 };
+
+
+class MorselContainer {
+  private:
+  std::string subOperator;
+  std::vector<std::string> argList;
+  Morsel *morsel;
+  public:
+  MorselContainer(Morsel *morsel) { this->morsel = morsel; }
+  std::string getSubOperator();
+  std::vector<std::string> getArgList();
+  int setSubOperator(std::string op);
+  int setArgList(std::vector<std::string> argumentsList);
+};
+

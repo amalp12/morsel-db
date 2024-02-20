@@ -1,0 +1,26 @@
+\hypertarget{classOperator}{}\doxysection{Operator Class Reference}
+\label{classOperator}\index{Operator@{Operator}}
+\doxysubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classOperator_aee48f431fc54a66c6eba729f8757583e}\label{classOperator_aee48f431fc54a66c6eba729f8757583e}} 
+static \mbox{\hyperlink{classTupleStream}{Tuple\+Stream}} $\ast$ {\bfseries scan} (\mbox{\hyperlink{classMorsel}{Morsel}} $\ast$table\+Head\+Morsel, std\+::vector$<$ std\+::string $>$ col\+Names, std\+::vector$<$ int $>$ col\+Types)
+\item 
+\mbox{\Hypertarget{classOperator_af2d4fc2cff7e26f5e7c442bf59556fc0}\label{classOperator_af2d4fc2cff7e26f5e7c442bf59556fc0}} 
+static bool {\bfseries match} (void $\ast$value1, void $\ast$value2, int operator\+Type, int value\+Type, int entry\+Size)
+\item 
+\mbox{\Hypertarget{classOperator_a7a43bdb0854fa3decd224820fddd9650}\label{classOperator_a7a43bdb0854fa3decd224820fddd9650}} 
+static void $\ast$ {\bfseries filter} (void $\ast$tuple, \mbox{\hyperlink{classTupleStream}{Tuple\+Stream}} $\ast$ts, std\+::vector$<$ std\+::string $>$ select\+List)
+\item 
+\mbox{\Hypertarget{classOperator_acfef70bf5f9384f76f5321ca540d0557}\label{classOperator_acfef70bf5f9384f76f5321ca540d0557}} 
+static int {\bfseries scatter} (void $\ast$tuple, \mbox{\hyperlink{classMorsel}{Morsel}} $\ast$morsel, std\+::vector$<$ \mbox{\hyperlink{structAttribute}{Attribute}} $>$ attribute\+List)
+\item 
+\mbox{\Hypertarget{classOperator_a4330e9f403c9edea444f9a735ca5a410}\label{classOperator_a4330e9f403c9edea444f9a735ca5a410}} 
+static void {\bfseries loop} (std\+::function$<$ bool(union \mbox{\hyperlink{unionLoopFnArgs}{Loop\+Fn\+Args}} args)$>$ fn, union \mbox{\hyperlink{unionLoopFnArgs}{Loop\+Fn\+Args}} args)
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+include/operators.\+h\item 
+src/operators.\+cpp\end{DoxyCompactItemize}
