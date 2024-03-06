@@ -1,33 +1,60 @@
 #include "test.h"
+#include <algorithm>
 
 
-void initMorsel(int core , std::string tableName)
+void initMorsel(int core , std::string tableName , int start_index , int end_index)
 {
     RelationCatalog relCat;
-    Row hardcodedRow = {1, "John", 30};
-    void* destination = malloc(sizeof(Row));
-    memcpy(destination, &hardcodedRow, sizeof(Row));
-    relCat.appendToThreadMapMorsel(tableName , core , destination);
+    Row* destination = new Row();
+    std::ifstream file("/home/ssl/Code/db/in/test_table.csv");
 
-    hardcodedRow = {2, "Bill", 25};
-    memcpy(destination, &hardcodedRow, sizeof(Row));
-    relCat.appendToThreadMapMorsel(tableName , core , destination);
+    if (!file.is_open()) {
+        std::cerr << "Failed to open file!" << std::endl;
+        return;
+    }
 
-    hardcodedRow = {3, "Mary", 21};
-    memcpy(destination, &hardcodedRow, sizeof(Row));
-    relCat.appendToThreadMapMorsel(tableName , core , destination);
+    int currentLine = 0;
 
-    hardcodedRow = {4, "Ken", 35};
-    memcpy(destination, &hardcodedRow, sizeof(Row));
-    relCat.appendToThreadMapMorsel(tableName , core , destination);
+    std::string line;
+    while (std::getline(file, line))
+    {
+        currentLine++;
 
-    hardcodedRow = {5, "Laura", 27};
-    memcpy(destination, &hardcodedRow, sizeof(Row));
-    relCat.appendToThreadMapMorsel(tableName , core , destination);
+       // Check if the current line is within the desired range
+        if (currentLine < start_index)
+            continue; // Skip lines until startLine is reached
 
-    hardcodedRow = {6, "Jack", 26};
-    memcpy(destination, &hardcodedRow, sizeof(Row));
-    relCat.appendToThreadMapMorsel(tableName , core , destination);
+        // Stop loading if we reach endLine
+        if (currentLine > end_index)
+            break;
+
+        size_t pos1 = line.find(';');
+        size_t pos2 = line.find(';', pos1 + 1);
+
+        std::string idStr = line.substr(0, pos1);
+        std::string nameStr = line.substr(pos1 + 1, pos2 - pos1 - 1);
+        std::string ageStr = line.substr(pos2 + 1);
+
+        int id = std::stoi(idStr);
+        int age = std::stoi(ageStr);
+
+        char name[STRING_SIZE]; 
+        std::strcpy(name, nameStr.c_str());
+
+        Row record;
+
+        record.id = id;
+        std::strcpy(record.name, name);
+        record.age = age;
+
+
+        memcpy(destination, &record, sizeof(Row));
+        relCat.appendToThreadMapMorsel(tableName , core , destination);
+
+       
+    }
+
+    delete destination;
     
 }
 
@@ -42,18 +69,26 @@ int create_table_test(){
     std::vector<int>  colTypeList = {INTEGER , STRING , INTEGER};
     relCat.insertNewTable(tableName , colNameList , colTypeList);
     
-    initMorsel(0 , tableName);
+    // initMorsel(0 , tableName);
     //Create threads
-    std::thread threads[4];
+    std::vector<std::thread> threads;
+    const std::string filename("/home/ssl/Code/db/in/test_table.csv");
+    std::ifstream file(filename);
+    int total_lines = std::count(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>(), '\n');
+    int lines_per_thread = total_lines / NUMBER_OF_CORES;
 
     //Launch threads
-    for (int i = 0; i < 4; ++i) {
-        // threads[i] = std::thread(initMorsel , i , tableName);
+    for (int i = 0; i < NUMBER_OF_CORES; ++i) {
+        int start_line = lines_per_thread* i;
+        int end_line = (i < NUMBER_OF_CORES - 1) ? start_line + lines_per_thread
+                                                 : total_lines;
+        threads.emplace_back(initMorsel, i ,tableName, start_line, end_line);
+        // threads[i] = std::thread(initMorsel , i , tableName , i*lines_per_thread+ 1, (i+1)*10000);
     }
 
     // Join threads
-    for (int i = 0; i < 4; ++i) {
-        // threads[i].join();
+    for (int i = 0; i < NUMBER_OF_CORES; ++i) {
+        threads[i].join();
     }
     return 0;
 }

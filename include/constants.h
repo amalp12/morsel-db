@@ -43,7 +43,7 @@ enum SELECT_LOOP_ARG_INDEX {
 };
 
 // Number of cores
-const int NUMBER_OF_CORES = 4;
+const int NUMBER_OF_CORES = 1;
 const int MAX_MORSEL_SIZE = 10000;
 
 #endif

@@ -44,6 +44,9 @@ TupleStream::TupleStream(Morsel *morsel, std::vector<std::string> colNameList,
 }
 
 void TupleStream::printStream() {
+  
+  // reset the tuple stream
+  this->resetStream();
   Morsel *m = morsel;
 
   // get the attribute list
@@ -84,11 +87,16 @@ void TupleStream::printStream() {
     }
 
     m = m->getNext();
+    if(m != nullptr)
+    {
+      numEntriesFilled = m->getFilledNumberOfEntries();
+    }
   }
 }
 void TupleStream::resetStream(){
   this->morsel=this->intitialMorsel;
   this->currentIndex = 0;
+  this->morselStart = morsel->getStartPtr();
 }
 
 void *ReadTupleStream::yieldNext() {
@@ -173,6 +181,8 @@ void TupleStream::writeStream(std::string filename)
   std::ofstream file;
   // open file
   file.open(filename);
+  // reset the tuple stream
+  this->resetStream();
   Morsel *m = morsel;
 
   // get the attribute list
@@ -184,10 +194,10 @@ void TupleStream::writeStream(std::string filename)
     // append  attribute name
     file << attributeList[i].name << " ";
   }
-  file << std::endl;
+  file << '\n';
 
   // get the number of entries
-  int numEntriesFilled = m->getTotalNumberOfEntries();
+  int numEntriesFilled = m->getFilledNumberOfEntries();
 
   // get the morsel start
   // void *morselStart = m->getStartPtr();
@@ -214,10 +224,15 @@ void TupleStream::writeStream(std::string filename)
         
         }
       }
-      file << std::endl;
+      file << '\n';
     }
 
     m = m->getNext();
+    if(m != nullptr)
+    {
+      numEntriesFilled = m->getFilledNumberOfEntries();
+    }
   }
+  file.flush();
   file.close();
 }

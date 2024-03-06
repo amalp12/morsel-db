@@ -60,6 +60,7 @@ int main(int argc, char **argv) {
 
         // call execute on the qep object
         qep.execute(0);
+        return 0;
         
         // create 4 threads and call exicute on each
         // std::vector<std::thread> threads;
@@ -76,10 +77,10 @@ int main(int argc, char **argv) {
         // }
       }
 
-      PgQueryParseResult result2;
-      result2 = pg_query_parse(query.data());
-      std::cout << result2.parse_tree << "\n";
-      pg_query_free_parse_result(result2);
+      // PgQueryParseResult result2;
+      // result2 = pg_query_parse(query.data());
+      // std::cout << result2.parse_tree << "\n";
+      // pg_query_free_parse_result(result2);
     } catch (...) {
       // Handle any exceptions if needed
       std::cerr << "An error occurred.\n";

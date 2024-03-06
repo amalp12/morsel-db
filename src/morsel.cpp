@@ -8,6 +8,7 @@ Morsel::Morsel(int morselSize, int morselEntrySize) {
   // allocate memorygetTableName
   startPtr = (void *)new char[morselSize];
   nextFreeIndex = 0;
+  filledEntries = 0;
 }
 
 std::string MorselContainer::getSubOperator() { return subOperator; }
@@ -84,7 +85,7 @@ int Morsel::insertEntry(void *entry) {
 
 
 int Morsel::insertEntry(void *entry , std::vector<Attribute> attributeList){
-  if (this->nextFreeIndex >= getTotalNumberOfEntries()) {
+  if (this->filledEntries >= getTotalNumberOfEntries()) {
     if (next == NULL) {
       // create new morsel
       next = new Morsel(size, entrySize);
