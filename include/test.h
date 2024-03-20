@@ -5,7 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <vector>
+#include <list>
 
 
 struct Row {
@@ -18,3 +18,5 @@ struct Row {
 void initMorsel(int core , std::string tableName , int start_index , int end_index);
 
 int create_table_test();
+
+void destructRelcat();

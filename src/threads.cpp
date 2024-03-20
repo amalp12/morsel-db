@@ -14,7 +14,7 @@ int threadFunction(){
 
 int initThreads(){
   // start NUMBER_OF_THREADS threads
-  std::vector<std::thread> THREADS;
+  std::list<std::thread> THREADS;
 
   for (int i = 0; i < NUMBER_OF_CORES; i++){
     // THREADS[i] = std::thread(threadFunction, i);

@@ -2,9 +2,11 @@
 
 bool fn_select_loop(LoopFnArgs args)
 {
+    
     // function identifier
     int fnIdentifier = SELECT_FN_IDENTIFER;
     ReadTupleStream * input_ts = args.selectArgs.input_ts;
+
     void * input_tuple = input_ts->yieldNext();
     if (input_tuple == NULL)
     {
@@ -19,7 +21,7 @@ bool fn_select_loop(LoopFnArgs args)
         }
     }
     // get the value offset of the columns needed for comparison
-        // the output tuple stream already contains the nessesarily modified attributes vectoror for the output tuple
+        // the output tuple stream already contains the nessesarily modified attributes listor for the output tuple
     Tuple tup;
     void * input_tuple_val = tup.getTupleValue(selectedAttrFromInputForCompare, input_tuple);
     
@@ -51,7 +53,9 @@ bool fn_select_loop(LoopFnArgs args)
     }
     
     output_ts->insert(output_tuple);
+    free(output_tuple);
 
+    
 
     return true;
 

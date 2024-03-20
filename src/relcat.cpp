@@ -1,6 +1,6 @@
 #include "relcat.h"
  
-std::vector<RelationCatalogEntry> RelationCatalog::catList;
+std::list<RelationCatalogEntry> RelationCatalog::catList;
 
 RelationCatalogEntry::RelationCatalogEntry() {
   tableName = "";
@@ -9,7 +9,7 @@ RelationCatalogEntry::RelationCatalogEntry() {
 
 std::string RelationCatalogEntry::getTableName() { return tableName; }
 
-std::vector<Attribute> RelationCatalogEntry::getAttributes() {
+std::list<Attribute> RelationCatalogEntry::getAttributes() {
   return attributeList;
 }
 
@@ -24,26 +24,36 @@ int RelationCatalogEntry::setTableName(std::string name) {
 
 // get attribute size from the type
 
-  int RelationCatalogEntry::setAttributes(std::vector<Attribute> attributeList){
+  int RelationCatalogEntry::setAttributes(std::list<Attribute> attributeList){
     this->attributeList = attributeList;
     return 0;
   }
 
 
-int RelationCatalogEntry::setAttributes(std::vector<std::string> colNameList,
-                                       std::vector<int> colTypeList) {
-  for (size_t i = 0; i < colNameList.size(); i++) {
+int RelationCatalogEntry::setAttributes(std::list<std::string> colNameList,
+                                       std::list<int> colTypeList) {
+  auto iter=attributeList.begin();
+  auto iter_colNameList=colNameList.begin();
+  auto iter_colTypeList=colTypeList.begin();
+  int index = 0;
+
+  while(iter_colNameList != colNameList.end() && iter_colTypeList != colTypeList.end())
+  {
     Attribute attr;
-    attr.name = colNameList[i];
-    attr.type = colTypeList[i];
-    attr.size = getAttributeSizeFromType(colTypeList[i]);
-    if(i==0){
+    attr.name = *iter_colNameList;
+    attr.type = *iter_colTypeList;
+    attr.size = getAttributeSizeFromType(*iter_colTypeList);
+    if(iter_colNameList == colNameList.begin()){
       attr.offset = 0;
     }else{
-      attr.offset = attributeList[i-1].offset + attributeList[i-1].size;
+      attr.offset = attributeList.back().offset + attributeList.back().size;
     }
-    attr.attributeIndex = i;
+    attr.attributeIndex = index;
     attributeList.emplace_back(attr);
+    index++;
+    iter++;
+    iter_colNameList++;
+    iter_colTypeList++;
   }
   return 0;
 }
@@ -51,7 +61,7 @@ int RelationCatalogEntry::setAttributes(std::vector<std::string> colNameList,
 
 
 int RelationCatalog::insertNewTable(std::string name,
-                                    std::vector<Attribute> attrs) {
+                                    std::list<Attribute> attrs) {
   // create new relations cat entry
   RelationCatalogEntry *entry = new RelationCatalogEntry();
 
@@ -78,8 +88,8 @@ int RelationCatalog::insertNewTable(std::string name,
 }
 
 int RelationCatalog::insertNewTable(std::string name,
-                                    std::vector<std::string> colNameList,
-                                    std::vector<int> colTypeList) {
+                                    std::list<std::string> colNameList,
+                                    std::list<int> colTypeList) {
   // create new relations cat entry
   RelationCatalogEntry *entry = new RelationCatalogEntry();
 
@@ -87,7 +97,7 @@ int RelationCatalog::insertNewTable(std::string name,
   entry->setTableName(name);
   entry->setAttributes(colNameList, colTypeList);  
   
-  std::vector<Attribute> attributeList = entry->getAttributes();
+  std::list<Attribute> attributeList = entry->getAttributes();
   int entrySize = 0;
   for(auto iter = attributeList.begin() ; iter != attributeList.end() ; iter++)
   {
@@ -120,20 +130,59 @@ int RelationCatalog::getTableEntry(std::string tableName,
   return 1;
 }
 
+void RelationCatalogEntry::clearEntry() {
+  tableName.clear();
+  // for each entry in attirbuteList
+  for(auto &attr:attributeList){
+    attr.name.clear();
+  }
+  // clear attibute list
+  attributeList.clear();
+
+  // for each entry in threadmap
+  for(auto &thread:threadMap){
+    // deallocate all morsels
+    Morsel * ptr = thread.second;
+    while(ptr){
+      Morsel * temp = ptr;
+      ptr = ptr->getNext();
+      free(temp);
+    }
+  }
+  // clear threadmap
+  threadMap.clear();
+
+
+}
+void RelationCatalog::deleteRelcat(){
+
+  // for each entry in catList
+  for(auto &catEntry:catList){
+
+    // clear entry
+    catEntry.clearEntry();    
+    
+  }
+  // clear catList
+  catList.clear();
+}
+
+
+
 int relcatInit(){
 
 
   // create a relation entry for the relation catalog itself
 
-  std::vector<std::string> colNameList;
-  std::vector<int> colTypeList;
+  std::list<std::string> colNameList;
+  std::list<int> colTypeList;
   std::map<int, void* > threadMap;
 
 
 
   colNameList.emplace_back("table_name");
-  colNameList.emplace_back("column_name_vector");
-  colNameList.emplace_back("column_type_vector");
+  colNameList.emplace_back("column_name_list");
+  colNameList.emplace_back("column_type_list");
   colNameList.emplace_back("thread_to_morsel_map");
 
   // insert into RELCAT

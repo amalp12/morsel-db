@@ -2,7 +2,7 @@
 #include "constants.h"
 #include "morsel.h"
 #include <string>
-#include <vector>
+#include <list>
 #include "attribute.h"
 #include "relcat.h"
 #include <fstream>
@@ -18,23 +18,23 @@ protected:
   Morsel * intitialMorsel;
   Morsel *morsel;
   void *morselStart;
-  std::vector<Attribute> attributeList;
+  std::list<Attribute> attributeList;
   int entrySize; // in bytes
   int currentIndex;
 
 public:
   TupleStream(Morsel *morsel, 
-            std::vector<std::string> colNameList,
-                                       std::vector<int> colTypeList);
+            std::list<std::string> colNameList,
+                                       std::list<int> colTypeList);
   TupleStream(RelationCatalogEntry *relEntry, int coreNum);
 
   void printStream();
   void writeStream(std::string filename);
   void resetStream();
 
-  std::vector<Attribute> getAttributeList();
-  int setAttributes(std::vector<std::string> colNameList,
-                                       std::vector<int> colTypeList);
+  std::list<Attribute> getAttributeList();
+  int setAttributes(std::list<std::string> colNameList,
+                                       std::list<int> colTypeList);
 
   int getEntrySize();
 };
@@ -43,8 +43,8 @@ public:
 class ReadTupleStream: public TupleStream{
   public:
     ReadTupleStream(Morsel *morsel, 
-            std::vector<std::string> colNameList,
-                                       std::vector<int> colTypeList) : TupleStream(morsel, colNameList, colTypeList){
+            std::list<std::string> colNameList,
+                                       std::list<int> colTypeList) : TupleStream(morsel, colNameList, colTypeList){
       
     }
     ReadTupleStream(RelationCatalogEntry *relEntry, int coreNum) :  TupleStream(relEntry, coreNum){
@@ -58,8 +58,8 @@ class ReadTupleStream: public TupleStream{
 class WriteTupleStream: public TupleStream{
   public:
     WriteTupleStream(Morsel *morsel, 
-            std::vector<std::string> colNameList,
-                                       std::vector<int> colTypeList) : TupleStream(morsel, colNameList, colTypeList){
+            std::list<std::string> colNameList,
+                                       std::list<int> colTypeList) : TupleStream(morsel, colNameList, colTypeList){
       
     }
     WriteTupleStream(RelationCatalogEntry *relEntry, int coreNum) :  TupleStream(relEntry, coreNum){

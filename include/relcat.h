@@ -3,7 +3,8 @@
 #include <constants.h>
 #include <iostream>
 #include <map>
-#include <vector>
+#include <list>
+#include <list>
 #include "attribute.h"
 #include "morsel.h"
 
@@ -11,31 +12,34 @@
 class RelationCatalogEntry {
 private:
   std::string tableName;
-  std::vector<Attribute> attributeList;
+  std::list<Attribute> attributeList;
 
 public:
   std::map<int, Morsel *> threadMap;
   RelationCatalogEntry();
   std::string getTableName();
-  std::vector<Attribute> getAttributes();
+  std::list<Attribute> getAttributes();
   int setTableName(std::string name);
-  int setAttributes(std::vector<std::string> colNameList,
-                    std::vector<int> colTypeList);
-  int setAttributes(std::vector<Attribute> attributeList);
+  int setAttributes(std::list<std::string> colNameList,
+                    std::list<int> colTypeList);
+  int setAttributes(std::list<Attribute> attributeList);
+  void clearEntry();
 };
 
 class RelationCatalog {
 private:
-  static std::vector<RelationCatalogEntry> catList;
+  static std::list<RelationCatalogEntry> catList;
 
 public:
   static int insertNewTable(std::string name,
-                                    std::vector<std::string> colNameList,
-                                    std::vector<int> colTypeList);
+                                    std::list<std::string> colNameList,
+                                    std::list<int> colTypeList);
   static int insertNewTable(std::string name,
-                                    std::vector<Attribute> attrs);
+                                    std::list<Attribute> attrs);
   static int getTableEntry(std::string tableName,
                            RelationCatalogEntry *vesselPtr);
+  static void deleteRelcat();
+                           
 
   static int appendToThreadMapMorsel(std::string tableName , int core , void * morselEntry){
 

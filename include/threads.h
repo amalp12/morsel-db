@@ -1,6 +1,6 @@
 #pragma once
 #include <constants.h>
-#include <vector>
+#include <list>
 #include <thread>
 #include "dispatcher.h"
 #include "relcat.h"
@@ -8,7 +8,7 @@
 
 // create a global array of threads
 
-// std::vector<std::thread> THREADS;
+// std::list<std::thread> THREADS;
 
 
 int initThreads();

@@ -26,7 +26,7 @@ cmake -G Ninja .. \
   -DLLVM_ENABLE_LLD=ON
 
 #cmake --build . --target basic-opt externfunc externfuncshared
-cmake --build . --target dbapp
+cmake --build . --target dbapp morsel_test
 
 cd ..
 # test run

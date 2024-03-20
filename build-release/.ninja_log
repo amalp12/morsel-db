@@ -1,0 +1,15 @@
+# ninja log v5
+2	1034	1710926552300232393	src/CMakeFiles/srclib.dir/operators.cpp.o	f3ed07ac965fe8a3
+5	962	1710926552236225770	src/CMakeFiles/srclib.dir/loop_functions.cpp.o	240e9b83bde688d9
+1385	1682	1710926552952299854	src/libsrclib.a	7b91c7549175711e
+3	1024	1710926552292231565	src/CMakeFiles/srclib.dir/relcat.cpp.o	c9e2187e8fb719e3
+4	755	1710923528555935736	src/CMakeFiles/srclib.dir/parser.cpp.o	ecb31e6447826b14
+2	713	1710923528535933131	src/CMakeFiles/srclib.dir/morsel.cpp.o	4423a048f6b03e9e
+7	947	1710926552220224115	src/CMakeFiles/dbapp.dir/app.cpp.o	ecf00b760cda97ae
+3	1385	1710926552656269227	src/CMakeFiles/srclib.dir/dispatcher.cpp.o	1bd9efd1265d588d
+5	458	1710923528259897193	src/CMakeFiles/srclib.dir/attribute.cpp.o	9795c07b51595bf4
+5	986	1710926552260228254	src/CMakeFiles/srclib.dir/tuple.cpp.o	bfdba6bf2a7db466
+4	932	1710926552204222460	src/CMakeFiles/srclib.dir/init.cpp.o	7f312f897dde0d96
+6	1359	1710926552580261364	src/CMakeFiles/srclib.dir/test.cpp.o	bb80955209cff4eb
+7	723	1710923528571937819	src/CMakeFiles/srclib.dir/lib.cpp.o	7bf4ce3348f72b5a
+1683	1967	1710926553236329237	src/dbapp	8c1533071606bd31

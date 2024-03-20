@@ -1,7 +1,7 @@
 #include "dispatcher.h"
 
 const hsql::SQLStatement *QEP::statement;
-std::map<hsql::Expr *, std::array<int, NUMBER_OF_CORES>> QEP::dependencyMap;
+std::map<hsql::Expr *, std::array<int, 16>> QEP::dependencyMap;
 hsql::StatementType QEP::statementType;
 std::queue<MorselContainer> QEP::qepQueue;
 // Dispatcher DISPATCHER;
@@ -18,7 +18,7 @@ int QEP::assignDependancies(int coreNum) {
     if (selectStatement->whereClause != NULL) {
       dependencyMap[selectStatement->whereClause][coreNum] = 1;
     }
-    // select vector
+    // select list
     for (auto expr : *(selectStatement->selectList)) {
       dependencyMap[expr][coreNum] = 1;
     }
@@ -46,7 +46,7 @@ int QEP::execute(int coreNum) {
 
   // if the statement is select
   if (statementType == hsql::kStmtSelect) {
-    // declare vectors to store columsn table and where clause
+    // declare lists to store columsn table and where clause
     std::string table;
     std::string whereClause;
     Attribute lhsAttr;
@@ -70,23 +70,23 @@ int QEP::execute(int coreNum) {
     }
 
     // get entire table column attributes
-    auto columnsVector = entry->getAttributes();
+    auto columnslist = entry->getAttributes();
 
-    // create a vector for the selected columns
-    std::vector<std::string> selectedColNameList;
-    std::vector<int> selectedColTypeList;
+    // create a list for the selected columns
+    std::list<std::string> selectedColNameList;
+    std::list<int> selectedColTypeList;
 
     // Parse columns
     for (const auto *column : *selectStatement->selectList) {
       if (column->type == hsql::kExprColumnRef) {
         //  std::cout << column->name << " ";
 
-        // search the columnsVector for the column name and append that
-        // Attribute to the selectedColumnsVector
-        for (auto attribute : columnsVector) {
+        // search the columnslist for the column name and append that
+        // Attribute to the selectedColumnslist
+        for (auto attribute : columnslist) {
           if (attribute.name == column->name) {
-            selectedColNameList.push_back(attribute.name);
-            selectedColTypeList.push_back(attribute.type);
+            selectedColNameList.emplace_back(attribute.name);
+            selectedColTypeList.emplace_back(attribute.type);
           }
         }
       }
@@ -109,15 +109,15 @@ int QEP::execute(int coreNum) {
 
       // if the table is not found
       if (ret != 0) {
-        std::cout << "Table not found\n";
+        std::cout << "\n";
         return -1;
       }
 
       // get entire table column attributes
-      auto columnsVector = entry->getAttributes();
+      auto columnslist = entry->getAttributes();
 
       // get attribute of LHS
-      for (auto attribute : columnsVector) {
+      for (auto attribute : columnslist) {
         if (attribute.name == lhs->name) {
           lhsAttr = attribute;
         }
@@ -125,8 +125,9 @@ int QEP::execute(int coreNum) {
 
       // create a new table
       RelationCatalog relCat;
-      // SELECT Name FROM test_table WHERE Age > 25;
+      // SELECT ID,Name,Age FROM test_table WHERE Age > 0;
 
+      
       relCat.insertNewTable("_" + entry->getTableName(), selectedColNameList,
                             selectedColTypeList);
 
@@ -156,9 +157,9 @@ int QEP::execute(int coreNum) {
       Operator::loop(fn_select_loop, args);
 
       // print the output tuple stream for debugging
-      std::string output_file_name = "/home/ssl/Code/db/out/output_" +
-                                     entry->getTableName() + "_" +
-                                     std::to_string(coreNum) + ".txt";
+      // std::string output_file_name = "/home/ssl/Code/db/out/output_" +
+                                    //  entry->getTableName() + "_" +
+                                    //  std::to_string(coreNum) + ".txt";
       // args.selectArgs.output_ts->writeStream(output_file_name);
 
       // peda gdb
@@ -168,6 +169,88 @@ int QEP::execute(int coreNum) {
     }
     // std::cout << "Exiting Select ... " <<std::endl;
   }
+
+  if(statementType == hsql::kStmtCreate)
+  {
+    RelationCatalog relCat;
+    const hsql::CreateStatement *createStatement = 
+        static_cast<const hsql::CreateStatement *>(statement);
+
+    std::string tableName = createStatement->tableName;
+    std::list<std::string> colNameList;
+    std::list<int>  colTypeList;
+
+    for(const auto *column : *createStatement->columns)
+    {
+      colNameList.emplace_back(column->name);
+    
+      if(column->type == hsql::DataType::INT)
+       colTypeList.emplace_back(INTEGER);
+
+      else if(column->type == hsql::DataType::VARCHAR)
+       colTypeList.emplace_back(STRING);
+      else if(column->type == hsql::DataType::TEXT)
+       colTypeList.emplace_back(STRING);
+      else
+        std::cout << column << '\n';
+      
+    
+    }
+    
+    relCat.insertNewTable(tableName , colNameList , colTypeList);
+  }
+
+
+  if(statementType == hsql::kStmtInsert){
+
+    RelationCatalog relCat;
+
+    const hsql::InsertStatement* insertStatement = 
+        static_cast<const hsql::InsertStatement*>(statement);
+    
+    std::string tableName = insertStatement->tableName;
+    RelationCatalogEntry* entry = new RelationCatalogEntry();
+    
+    int ret = relCat.getTableEntry(tableName, entry);
+    
+    // Check if the table is not found
+    if (ret != 0) {
+      std::cout << "Table not found (insert)\n";
+      delete entry; // Clean up allocated memory
+      return -1;
+    }
+    
+    std::list<Attribute> attributeList = entry->getAttributes();
+    
+    // Calculate record size
+    int recordSize = 0;
+    for (const auto& attribute : attributeList) {
+      recordSize += attribute.size;
+    }
+    
+    // Allocate memory for destination
+    char* destination = new char[recordSize]; // static_cast<char*>(malloc(recordSize));
+    int insertStatementIndex=0;
+    for (auto iter = attributeList.begin() ; iter != attributeList.end(); ++iter) {
+      if ((*iter).type == INTEGER) {
+        int value = (*insertStatement->values)[insertStatementIndex]->ival;
+        memcpy(destination + (*iter).offset, &value, INTEGER_SIZE);
+      } else if ((*iter).type == STRING) {
+        const char* strValue = (*insertStatement->values)[insertStatementIndex]->name;
+        memcpy(destination + (*iter).offset, strValue, STRING_SIZE);
+      }
+      insertStatementIndex++;
+    }
+    
+    // Append to thread map morsel
+    relCat.appendToThreadMapMorsel(tableName, coreNum, destination);
+    
+    // Clean up allocated memory
+    delete[] destination;
+    delete entry;
+
+  }
+
   // Get the current time after running the program
   auto end_time = std::chrono::high_resolution_clock::now();
   // Calculate the duration in milliseconds
@@ -177,7 +260,8 @@ int QEP::execute(int coreNum) {
   std::cout << "Time taken: " << duration.count() << " milliseconds"
             << std::endl;
 
-  return 0;
+  return duration.count();
+  // return 0;
 }
 
 int Dispatcher::execute(int coreNum) { return 0; }

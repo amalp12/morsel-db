@@ -13,7 +13,7 @@ Morsel::Morsel(int morselSize, int morselEntrySize) {
 
 std::string MorselContainer::getSubOperator() { return subOperator; }
 
-std::vector<std::string> MorselContainer::getArgList() { return argList; }
+std::list<std::string> MorselContainer::getArgList() { return argList; }
 
 Morsel *Morsel::getNext() { return next; }
 
@@ -22,7 +22,7 @@ int MorselContainer::setSubOperator(std::string op) {
   return 0;
 }
 
-int MorselContainer::setArgList(std::vector<std::string> argumentsList) {
+int MorselContainer::setArgList(std::list<std::string> argumentsList) {
   argList = argumentsList;
   return 0;
 }
@@ -50,11 +50,11 @@ int Morsel::setNthMorselEntry(int n, void *ptr) {
   return 0;
 }
 
-int Morsel::setNthMorselEntry(int n, void *ptr, std::vector<Attribute> attributeList) {
+int Morsel::setNthMorselEntry(int n, void *ptr, std::list<Attribute> attributeList) {
   void *nthMorsel = getNthMorselEntry(n);
   int offset = 0;
-  for (size_t i = 0; i < attributeList.size(); i++) {
-    Attribute attr = attributeList[(int)i];
+  for (auto iter = attributeList.begin() ; iter != attributeList.end() ; iter++) {
+    Attribute attr = *iter;
     memcpy((char *)nthMorsel + offset , (char *)ptr + attr.offset, attr.size);
     offset += attr.size;
   }
@@ -84,7 +84,7 @@ int Morsel::insertEntry(void *entry) {
 }
 
 
-int Morsel::insertEntry(void *entry , std::vector<Attribute> attributeList){
+int Morsel::insertEntry(void *entry , std::list<Attribute> attributeList){
   if (this->filledEntries >= getTotalNumberOfEntries()) {
     if (next == NULL) {
       // create new morsel

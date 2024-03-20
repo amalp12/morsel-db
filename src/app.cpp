@@ -5,33 +5,15 @@
 #include "dispatcher.h"
 #include <thread>
 #include "test.h"
-void parseSelectStatement(const hsql::SQLStatement* statement) {
-    if (statement->type() == hsql::kStmtSelect) {
-        const auto* selectStatement = static_cast<const hsql::SelectStatement*>(statement);
-        // Parse columns
-        std::cout << "Columns: ";
-        for (const auto* column : *selectStatement->selectList) {
-            if (column->type == hsql::kExprColumnRef) {
-                std::cout << column->name << " ";
-            }
-        }
-        std::cout << std::endl;
+#include "lib.h"
 
-        if (selectStatement->fromTable != nullptr) {
-            std::cout << "Table: " << selectStatement->fromTable->name << std::endl;
-        }
-
-        if (selectStatement->whereClause != nullptr) {
-            std::cout << "WHERE: \n"; ;hsql::printExpression(selectStatement->whereClause, 1);
-        }
-    }
-}
 
 int main(int argc, char **argv) {
 
-
-  create_table_test();
+  int coreNum = 0;
+  // create_table_test();
   while (true) {
+    create_table_test();
     try {
       std::cout << "Enter your query: ";
       std::string query;
@@ -52,7 +34,7 @@ int main(int argc, char **argv) {
 
         // print the enum constant
         // std::cout << "Statement Greater: " << hsql::kOpGreater << std::endl;
-        // parseSelectStatement(statement);
+        parseSelectStatement(statement);
         // test code
         // create a local qep object
        
@@ -60,19 +42,34 @@ int main(int argc, char **argv) {
 
         // call execute on the qep object
         // qep.execute(0);
-        
-        // create 4 threads and call exicute on each
-        std::thread threads[NUMBER_OF_CORES];
 
-        //Launch threads
-        for (int i = 0; i < NUMBER_OF_CORES; ++i) {
+        if(isStatementMultithread(statement->type()))
+        {
+        //  create_table_test();
+         // create 4 threads and call exicute on each
+        //  std::list<std::thread> threads;
+         std::thread threads[NUMBER_OF_CORES];
+
+         //Launch threads
+         for (int i = 0; i < NUMBER_OF_CORES; ++i) {
             threads[i] = std::thread(qep.execute, i);
+            // threads.emplace_back(qep.execute, i);
+         }
+
+         // Join threads
+         for (int i = 0; i < NUMBER_OF_CORES; ++i) {
+            threads[i].join();
+         }
+
         }
 
-        // Join threads
-        for (int i = 0; i < NUMBER_OF_CORES; ++i) {
-            threads[i].join();
+        else
+        {
+           qep.execute(coreNum);
         }
+
+        coreNum =  (coreNum + 1)%NUMBER_OF_CORES;
+        
 
         // if (statement->isType(hsql::kStmtSelect)) {
         //   const auto *select =
@@ -90,7 +87,7 @@ int main(int argc, char **argv) {
       // Handle any exceptions if needed
       std::cerr << "An error occurred.\n";
     }
-    break;
+   destructRelcat();
   }
 
   return 0;

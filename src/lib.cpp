@@ -44,3 +44,52 @@ bool compareStr(char * value1 , char * value2 , int entrySize , int operatorType
 
 
 }}
+
+bool isStatementMultithread(hsql::StatementType type)
+{
+  switch (type)
+  {
+  case hsql::kStmtCreate :
+    return false;
+    break;
+
+  case hsql::kStmtInsert :
+    return false;
+    break;
+  
+  default:
+    return true;
+    break;
+  }
+}
+void parseSelectStatement(const hsql::SQLStatement* statement) {
+    // select statement
+    if (statement->type() == hsql::kStmtSelect) {
+        const auto* selectStatement = static_cast<const hsql::SelectStatement*>(statement);
+        // Parse columns
+        for (const auto* column : *selectStatement->selectList) {
+            if (column->type == hsql::kExprColumnRef) {
+            }
+        }
+        // std::cout << std::endl;
+
+        // if (selectStatement->fromTable != nullptr) {
+        //     std::cout << "Table: " << selectStatement->fromTable->name << std::endl;
+        // }
+
+        // if (selectStatement->whereClause != nullptr) {
+        //     std::cout << "WHERE: \n"; ;hsql::printExpression(selectStatement->whereClause, 1);
+        // }
+    }
+
+    // create table statement
+    if (statement->type() == hsql::kStmtCreate) {
+        const auto* createStatement = static_cast<const hsql::CreateStatement*>(statement);
+        // std::cout << "Table Name: " << createStatement->tableName << std::endl;
+        // std::cout << "Columns: ";
+        // for (const auto* column : *createStatement->columns) {
+        //     std::cout << column->name << " ";
+        // }
+        // std::cout << std::endl;
+    }
+}

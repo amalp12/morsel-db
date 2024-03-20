@@ -7,7 +7,7 @@
 #include <pg_query.h>
 #include <queue>
 #include <string>
-#include <vector>
+#include <list>
 #include "morsel.h"
 #include "relcat.h"
 #include "loop_functions.h"
@@ -17,7 +17,7 @@
 class QEP{
     public:
     static const hsql::SQLStatement * statement;
-    static std::map<hsql::Expr*, std::array<int, NUMBER_OF_CORES>> dependencyMap;
+    static std::map<hsql::Expr*, std::array<int, 16>> dependencyMap;
     static hsql::StatementType statementType;
     static std::queue<MorselContainer> qepQueue;
 

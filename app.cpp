@@ -34,6 +34,7 @@ int main(int argc, char **argv) {
   while (true) {
     try {
       std::cout << "Enter your query: ";
+      // SELECT ID, Name, Age FROM test_table WHERE Age > 0;
       std::string query;
       std::getline(std::cin, query);
 
@@ -52,7 +53,7 @@ int main(int argc, char **argv) {
 
         // print the enum constant
         // std::cout << "Statement Greater: " << hsql::kOpGreater << std::endl;
-        // parseSelectStatement(statement);
+        parseSelectStatement(statement);
         // test code
         // create a local qep object
 

@@ -31,6 +31,7 @@ list(APPEND CMAKE_MODULE_PATH "${LLVM_CMAKE_DIR}")
 include(TableGen)
 include(AddLLVM)
 include(AddMLIR)
+include(CTest)
 include(HandleLLVMOptions)
 
 include_directories(${LLVM_INCLUDE_DIRS})
@@ -44,3 +45,5 @@ add_definitions(${LLVM_DEFINITIONS})
 
 
 add_subdirectory(src)
+add_subdirectory(include)
+add_subdirectory(tests)

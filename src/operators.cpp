@@ -1,8 +1,8 @@
 #include "operators.h"
 
 TupleStream *Operator::scan(Morsel *tableHeadMorsel,
-                            std::vector<std::string> colNames,
-                            std::vector<int> colTypes) {
+                            std::list<std::string> colNames,
+                            std::list<int> colTypes) {
   return new TupleStream(tableHeadMorsel, colNames, colTypes);
 }
 
@@ -20,11 +20,12 @@ bool Operator::match(void *value1, void *value2, int operatorType , int valueTyp
 
 
 
-int Operator::scatter(void *tuple, Morsel *morsel , std::vector<Attribute> attributeList) {
+int Operator::scatter(void *tuple, Morsel *morsel , std::list<Attribute> attributeList) {
     return morsel->insertEntry(tuple , attributeList);
 }
 
 void Operator::loop(std::function<bool(union LoopFnArgs args)> fn, union LoopFnArgs args){
+
   // reset the tuple stream
   args.selectArgs.input_ts->resetStream();
 
@@ -35,11 +36,11 @@ void Operator::loop(std::function<bool(union LoopFnArgs args)> fn, union LoopFnA
 
 }
 
-// void *  Operator::filter(void * tuple, TupleStream * ts, std::vector<Attribute> selectList, Morsel * outputMorsel){
-// 	// get the  attribute vector of the tuple stream
-//   std::vector<Attribute> allAttributeList = ts->getAttributeList();
+// void *  Operator::filter(void * tuple, TupleStream * ts, std::list<Attribute> selectList, Morsel * outputMorsel){
+// 	// get the  attribute list of the tuple stream
+//   std::list<Attribute> allAttributeList = ts->getAttributeList();
 
-//   // for each attribute in the select vector, get the value from the tuple
+//   // for each attribute in the select list, get the value from the tuple
 
 
 
