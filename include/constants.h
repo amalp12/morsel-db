@@ -42,8 +42,5 @@ enum SELECT_LOOP_ARG_INDEX {
     SELECT_LOOP_ARG_OUTPUT_TUPLE_STREAM
 };
 
-// Number of cores
-static int NUMBER_OF_CORES = 15;
-static int MAX_MORSEL_SIZE = 264000;
 
 #endif

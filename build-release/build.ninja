@@ -659,6 +659,14 @@ build src/CMakeFiles/srclib.dir/test.cpp.o: CXX_COMPILER__srclib_Release /home/s
   OBJECT_DIR = src/CMakeFiles/srclib.dir
   OBJECT_FILE_DIR = src/CMakeFiles/srclib.dir
 
+build src/CMakeFiles/srclib.dir/static.cpp.o: CXX_COMPILER__srclib_Release /home/ssl/Code/db/src/static.cpp || cmake_object_order_depends_target_srclib
+  DEFINES = -D_DEBUG -D_GLIBCXX_ASSERTIONS -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS
+  DEP_FILE = src/CMakeFiles/srclib.dir/static.cpp.o.d
+  FLAGS = -fPIC -fno-semantic-interposition -fvisibility-inlines-hidden -Werror=date-time -fno-lifetime-dse -Wall -Wextra -Wno-unused-parameter -Wwrite-strings -Wcast-qual -Wno-missing-field-initializers -Wimplicit-fallthrough -Wno-nonnull -Wno-class-memaccess -Wno-redundant-move -Wno-pessimizing-move -Wno-noexcept-type -Wdelete-non-virtual-dtor -Wsuggest-override -Wno-comment -Wno-misleading-indentation -Wctad-maybe-unsupported -fdiagnostics-color -ffunction-sections -fdata-sections -O3 -DNDEBUG   -D_DEBUG -D_GLIBCXX_ASSERTIONS -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -UNDEBUG
+  INCLUDES = -I/home/ssl/Code/mlir-hello/thirdparty/llvm-project/llvm/include -I/home/ssl/Code/mlir-hello/thirdparty/llvm-project/build/include -I/home/ssl/Code/mlir-hello/thirdparty/llvm-project/mlir/include -I/home/ssl/Code/mlir-hello/thirdparty/llvm-project/build/tools/mlir/include -I/home/ssl/Code/db/include -I/home/ssl/Code/db/build-release/include -I/home/ssl/Code/db/./include
+  OBJECT_DIR = src/CMakeFiles/srclib.dir
+  OBJECT_FILE_DIR = src/CMakeFiles/srclib.dir
+
 
 # =============================================================================
 # Link build statements for STATIC_LIBRARY target srclib
@@ -667,7 +675,7 @@ build src/CMakeFiles/srclib.dir/test.cpp.o: CXX_COMPILER__srclib_Release /home/s
 #############################################
 # Link the static library src/libsrclib.a
 
-build src/libsrclib.a: CXX_STATIC_LIBRARY_LINKER__srclib_Release src/CMakeFiles/srclib.dir/morsel.cpp.o src/CMakeFiles/srclib.dir/operators.cpp.o src/CMakeFiles/srclib.dir/relcat.cpp.o src/CMakeFiles/srclib.dir/parser.cpp.o src/CMakeFiles/srclib.dir/attribute.cpp.o src/CMakeFiles/srclib.dir/dispatcher.cpp.o src/CMakeFiles/srclib.dir/init.cpp.o src/CMakeFiles/srclib.dir/lib.cpp.o src/CMakeFiles/srclib.dir/loop_functions.cpp.o src/CMakeFiles/srclib.dir/tuple.cpp.o src/CMakeFiles/srclib.dir/test.cpp.o
+build src/libsrclib.a: CXX_STATIC_LIBRARY_LINKER__srclib_Release src/CMakeFiles/srclib.dir/morsel.cpp.o src/CMakeFiles/srclib.dir/operators.cpp.o src/CMakeFiles/srclib.dir/relcat.cpp.o src/CMakeFiles/srclib.dir/parser.cpp.o src/CMakeFiles/srclib.dir/attribute.cpp.o src/CMakeFiles/srclib.dir/dispatcher.cpp.o src/CMakeFiles/srclib.dir/init.cpp.o src/CMakeFiles/srclib.dir/lib.cpp.o src/CMakeFiles/srclib.dir/loop_functions.cpp.o src/CMakeFiles/srclib.dir/tuple.cpp.o src/CMakeFiles/srclib.dir/test.cpp.o src/CMakeFiles/srclib.dir/static.cpp.o
   LANGUAGE_COMPILE_FLAGS = -fPIC -fno-semantic-interposition -fvisibility-inlines-hidden -Werror=date-time -fno-lifetime-dse -Wall -Wextra -Wno-unused-parameter -Wwrite-strings -Wcast-qual -Wno-missing-field-initializers -Wimplicit-fallthrough -Wno-nonnull -Wno-class-memaccess -Wno-redundant-move -Wno-pessimizing-move -Wno-noexcept-type -Wdelete-non-virtual-dtor -Wsuggest-override -Wno-comment -Wno-misleading-indentation -Wctad-maybe-unsupported -fdiagnostics-color -ffunction-sections -fdata-sections -O3 -DNDEBUG
   OBJECT_DIR = src/CMakeFiles/srclib.dir
   POST_BUILD = :

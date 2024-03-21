@@ -1,5 +1,4 @@
 #include "test.h"
-#include <algorithm>
 
 // destructMorsel
 void destructRelcat(){
@@ -69,6 +68,8 @@ void initMorsel(int core , std::string tableName , int start_index , int end_ind
 
 
 int create_table_test(){
+    // staticvars
+    StaticVars staticVars;
     
     RelationCatalog relCat;
     // SELECT Name FROM test_table WHERE Age > 25;
@@ -83,21 +84,20 @@ int create_table_test(){
     const std::string filename("/home/ssl/Code/db/in/test_table.csv");
     std::ifstream file(filename);
     int total_lines = std::count(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>(), '\n');
-    int lines_per_thread = total_lines / NUMBER_OF_CORES;
+    int lines_per_thread = total_lines / staticVars.getNumberOfCores();
 
 
     //Launch threads
-    for (int i = 0; i < NUMBER_OF_CORES; ++i) {
+    for (int i = 0; i < staticVars.getNumberOfCores(); i++) {
         int start_line = lines_per_thread*i + 1;
-        // int end_line = (i < NUMBER_OF_CORES - 1) ? start_line + lines_per_thread
-        //                                          : total_lines;
+       
         int end_line = start_line + lines_per_thread - 1;
-        threads.emplace_back(initMorsel, i ,tableName, start_line, end_line);
+        threads.emplace_back(initMorsel, i+1 ,tableName, start_line, end_line);
         // threads[i] = std::thread(initMorsel , i , tableName , i*lines_per_thread+ 1, (i+1)*10000);
     }
 
     // Join threads
-    for (int i = 0; i < NUMBER_OF_CORES; ++i) {
+    for (int i = 0; i < staticVars.getNumberOfCores(); i++) {
         threads[i].join();
     }
     return 0;

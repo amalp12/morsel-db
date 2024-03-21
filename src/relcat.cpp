@@ -62,6 +62,8 @@ int RelationCatalogEntry::setAttributes(std::list<std::string> colNameList,
 
 int RelationCatalog::insertNewTable(std::string name,
                                     std::list<Attribute> attrs) {
+  // staticvars
+  StaticVars staticVars;                                      
   // create new relations cat entry
   RelationCatalogEntry *entry = new RelationCatalogEntry();
 
@@ -75,9 +77,9 @@ int RelationCatalog::insertNewTable(std::string name,
     entrySize += iter->size;
   }
 
-  for(int coreNum = 0 ; coreNum < NUMBER_OF_CORES ; coreNum++)
+  for(int coreNum = 1 ; coreNum <= staticVars.getNumberOfCores() ; coreNum++)
   {
-    entry->threadMap[coreNum] = new Morsel(MAX_MORSEL_SIZE , entrySize);
+    entry->threadMap[coreNum] = new Morsel(staticVars.getMaxMorselSize() , entrySize);
   }
 
   // append to catList
@@ -90,6 +92,8 @@ int RelationCatalog::insertNewTable(std::string name,
 int RelationCatalog::insertNewTable(std::string name,
                                     std::list<std::string> colNameList,
                                     std::list<int> colTypeList) {
+  // staticvars
+  StaticVars staticVars;
   // create new relations cat entry
   RelationCatalogEntry *entry = new RelationCatalogEntry();
 
@@ -104,9 +108,9 @@ int RelationCatalog::insertNewTable(std::string name,
     entrySize += iter->size;
   }
 
-  for(int coreNum = 0 ; coreNum < NUMBER_OF_CORES ; coreNum++)
+  for(int coreNum = 1 ; coreNum <= staticVars.getNumberOfCores() ; coreNum++)
   {
-    entry->threadMap[coreNum] = new Morsel(MAX_MORSEL_SIZE , entrySize);
+    entry->threadMap[coreNum] = new Morsel(staticVars.getMaxMorselSize() , entrySize);
   }
 
   // append to catList

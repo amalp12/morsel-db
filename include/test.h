@@ -1,4 +1,5 @@
 #pragma once
+#include "static.h"
 #include <threads.h>
 #include "morsel.h"
 #include <cstring>
@@ -6,6 +7,7 @@
 #include <fstream>
 #include <sstream>
 #include <list>
+#include <algorithm>
 
 
 struct Row {

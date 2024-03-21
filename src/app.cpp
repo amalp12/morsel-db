@@ -10,7 +10,9 @@
 
 int main(int argc, char **argv) {
 
-  int coreNum = 0;
+  int coreNum = 1;
+  // create staticVars
+  StaticVars staticVars;
   // create_table_test();
   while (true) {
     create_table_test();
@@ -48,16 +50,16 @@ int main(int argc, char **argv) {
         //  create_table_test();
          // create 4 threads and call exicute on each
         //  std::list<std::thread> threads;
-         std::thread threads[NUMBER_OF_CORES];
+         std::thread threads[staticVars.getNumberOfCores()];
 
          //Launch threads
-         for (int i = 0; i < NUMBER_OF_CORES; ++i) {
-            threads[i] = std::thread(qep.execute, i);
+         for (int i = 0; i < staticVars.getNumberOfCores(); i++) {
+            threads[i] = std::thread(qep.execute, i+1);
             // threads.emplace_back(qep.execute, i);
          }
 
          // Join threads
-         for (int i = 0; i < NUMBER_OF_CORES; ++i) {
+         for (int i = 0; i < staticVars.getNumberOfCores(); i++) {
             threads[i].join();
          }
 
@@ -68,7 +70,7 @@ int main(int argc, char **argv) {
            qep.execute(coreNum);
         }
 
-        coreNum =  (coreNum + 1)%NUMBER_OF_CORES;
+        coreNum =  (coreNum + 1)%staticVars.getNumberOfCores();
         
 
         // if (statement->isType(hsql::kStmtSelect)) {

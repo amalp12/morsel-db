@@ -1,5 +1,6 @@
 #ifndef RELCAT_H
 #define RELCAT_H
+#include "static.h"
 #include <constants.h>
 #include <iostream>
 #include <map>
