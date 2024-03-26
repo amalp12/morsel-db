@@ -14,7 +14,7 @@ std::list<Attribute> RelationCatalogEntry::getAttributes() {
 }
 
 
-int RelationCatalogEntry::setTableName(std::string name) {
+int RelationCatalogEntry::setTableName(const std::string &name) {
   tableName = name;
   return 0;
 }
@@ -24,14 +24,14 @@ int RelationCatalogEntry::setTableName(std::string name) {
 
 // get attribute size from the type
 
-  int RelationCatalogEntry::setAttributes(std::list<Attribute> attributeList){
+  int RelationCatalogEntry::setAttributes(const std::list<Attribute> &attributeList){
     this->attributeList = attributeList;
     return 0;
   }
 
 
-int RelationCatalogEntry::setAttributes(std::list<std::string> colNameList,
-                                       std::list<int> colTypeList) {
+int RelationCatalogEntry::setAttributes(const std::list<std::string> &colNameList,
+                                       const std::list<int> &colTypeList) {
   auto iter=attributeList.begin();
   auto iter_colNameList=colNameList.begin();
   auto iter_colTypeList=colTypeList.begin();
@@ -60,8 +60,8 @@ int RelationCatalogEntry::setAttributes(std::list<std::string> colNameList,
 
 
 
-int RelationCatalog::insertNewTable(std::string name,
-                                    std::list<Attribute> attrs) {
+int RelationCatalog::insertNewTable(const std::string &name,
+                                    const std::list<Attribute> &attrs) {
   // staticvars
   StaticVars staticVars;                                      
   // create new relations cat entry
@@ -89,9 +89,9 @@ int RelationCatalog::insertNewTable(std::string name,
   return 0;
 }
 
-int RelationCatalog::insertNewTable(std::string name,
-                                    std::list<std::string> colNameList,
-                                    std::list<int> colTypeList) {
+int RelationCatalog::insertNewTable(const std::string &name,
+                                    const std::list<std::string> &colNameList,
+                                    const std::list<int> &colTypeList) {
   // staticvars
   StaticVars staticVars;
   // create new relations cat entry
@@ -119,7 +119,7 @@ int RelationCatalog::insertNewTable(std::string name,
   return 0;
 }
 
-int RelationCatalog::getTableEntry(std::string tableName,
+int RelationCatalog::getTableEntry(const std::string &tableName,
                                    RelationCatalogEntry *vesselPtr) {
   // search the catList
 
@@ -149,8 +149,10 @@ void RelationCatalogEntry::clearEntry() {
     Morsel * ptr = thread.second;
     while(ptr){
       Morsel * temp = ptr;
+      // free 
+      free(temp->getStartPtr());
       ptr = ptr->getNext();
-      free(temp);
+      delete temp;
     }
   }
   // clear threadmap

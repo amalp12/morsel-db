@@ -13,11 +13,16 @@ int main(int argc, char **argv) {
   int coreNum = 1;
   // create staticVars
   StaticVars staticVars;
+  // set cores and morsel size
+  staticVars.setNumberOfCores(10);
+
+  staticVars.setMaxMorselSize(264000);  
   // create_table_test();
   while (true) {
     create_table_test();
     try {
       std::cout << "Enter your query: ";
+      // SELECT Name, ID, Age from test_table WHERE Age > 0;
       std::string query;
       std::getline(std::cin, query);
 
@@ -44,22 +49,24 @@ int main(int argc, char **argv) {
 
         // call execute on the qep object
         // qep.execute(0);
+        // number of cores
+        int  numberOfCores = staticVars.getNumberOfCores();
 
         if(isStatementMultithread(statement->type()))
         {
         //  create_table_test();
          // create 4 threads and call exicute on each
         //  std::list<std::thread> threads;
-         std::thread threads[staticVars.getNumberOfCores()];
+         std::thread threads[numberOfCores];
 
          //Launch threads
-         for (int i = 0; i < staticVars.getNumberOfCores(); i++) {
+         for (int i = 0; i < numberOfCores; i++) {
             threads[i] = std::thread(qep.execute, i+1);
             // threads.emplace_back(qep.execute, i);
          }
 
          // Join threads
-         for (int i = 0; i < staticVars.getNumberOfCores(); i++) {
+         for (int i = 0; i < numberOfCores; i++) {
             threads[i].join();
          }
 
@@ -70,7 +77,7 @@ int main(int argc, char **argv) {
            qep.execute(coreNum);
         }
 
-        coreNum =  (coreNum + 1)%staticVars.getNumberOfCores();
+        coreNum =  (coreNum + 1)%numberOfCores;
         
 
         // if (statement->isType(hsql::kStmtSelect)) {

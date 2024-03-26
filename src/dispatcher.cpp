@@ -1,7 +1,7 @@
 #include "dispatcher.h"
 
 const hsql::SQLStatement *QEP::statement;
-std::map<hsql::Expr *, std::array<int, 16>> QEP::dependencyMap;
+std::map<hsql::Expr *, std::array<int, 48>> QEP::dependencyMap;
 hsql::StatementType QEP::statementType;
 std::queue<MorselContainer> QEP::qepQueue;
 // Dispatcher DISPATCHER;
@@ -42,7 +42,10 @@ QEP::QEP() {
 
 int QEP::execute(int coreNum) {
   // Get the current time before running the program
-  auto start_time = std::chrono::high_resolution_clock::now();
+  // auto start_time = std::chrono::high_resolution_clock::now();
+  std::chrono::time_point<std::chrono::high_resolution_clock> start_time;
+  // declare start time type
+
 
   // if the statement is select
   if (statementType == hsql::kStmtSelect) {
@@ -57,6 +60,7 @@ int QEP::execute(int coreNum) {
     auto tableName = selectStatement->fromTable != nullptr
                          ? selectStatement->fromTable->name
                          : NULL;
+    start_time = std::chrono::high_resolution_clock::now();
     // get relationcat entry
     RelationCatalogEntry *entry = new RelationCatalogEntry();
 
@@ -77,13 +81,13 @@ int QEP::execute(int coreNum) {
     std::list<int> selectedColTypeList;
 
     // Parse columns
-    for (const auto *column : *selectStatement->selectList) {
+    for (const auto &column : *(selectStatement->selectList)) {
       if (column->type == hsql::kExprColumnRef) {
         //  std::cout << column->name << " ";
 
         // search the columnslist for the column name and append that
         // Attribute to the selectedColumnslist
-        for (auto attribute : columnslist) {
+        for (auto &attribute : columnslist) {
           if (attribute.name == column->name) {
             selectedColNameList.emplace_back(attribute.name);
             selectedColTypeList.emplace_back(attribute.type);
@@ -114,10 +118,10 @@ int QEP::execute(int coreNum) {
       }
 
       // get entire table column attributes
-      auto columnslist = entry->getAttributes();
+      const auto columnslist = entry->getAttributes();
 
       // get attribute of LHS
-      for (auto attribute : columnslist) {
+      for (auto &attribute : columnslist) {
         if (attribute.name == lhs->name) {
           lhsAttr = attribute;
         }
@@ -127,12 +131,12 @@ int QEP::execute(int coreNum) {
       RelationCatalog relCat;
       // SELECT ID,Name,Age FROM test_table WHERE Age > 0;
 
-      
-      relCat.insertNewTable("_" + entry->getTableName(), selectedColNameList,
+      std::string tempTableName="_" + entry->getTableName();
+      relCat.insertNewTable(tempTableName, selectedColNameList,
                             selectedColTypeList);
 
       RelationCatalogEntry *newEntry = new RelationCatalogEntry();
-      ret = RELCAT.getTableEntry("_" + entry->getTableName(), newEntry);
+      ret = RELCAT.getTableEntry(tempTableName, newEntry);
 
       // call seleect fn loop
       union LoopFnArgs args;
@@ -157,6 +161,8 @@ int QEP::execute(int coreNum) {
       Operator::loop(fn_select_loop, args);
 
       // print the output tuple stream for debugging
+      // args.selectArgs.output_ts->printStream();
+
       // std::string output_file_name = "/home/ssl/Code/db/out/output_" +
                                     //  entry->getTableName() + "_" +
                                     //  std::to_string(coreNum) + ".txt";
@@ -170,7 +176,7 @@ int QEP::execute(int coreNum) {
     // std::cout << "Exiting Select ... " <<std::endl;
   }
 
-  if(statementType == hsql::kStmtCreate)
+  else if(statementType == hsql::kStmtCreate)
   {
     RelationCatalog relCat;
     const hsql::CreateStatement *createStatement = 
@@ -179,6 +185,8 @@ int QEP::execute(int coreNum) {
     std::string tableName = createStatement->tableName;
     std::list<std::string> colNameList;
     std::list<int>  colTypeList;
+
+    start_time = std::chrono::high_resolution_clock::now();
 
     for(const auto *column : *createStatement->columns)
     {
@@ -201,7 +209,7 @@ int QEP::execute(int coreNum) {
   }
 
 
-  if(statementType == hsql::kStmtInsert){
+  else if(statementType == hsql::kStmtInsert){
 
     RelationCatalog relCat;
 
@@ -209,6 +217,9 @@ int QEP::execute(int coreNum) {
         static_cast<const hsql::InsertStatement*>(statement);
     
     std::string tableName = insertStatement->tableName;
+
+    start_time = std::chrono::high_resolution_clock::now();
+
     RelationCatalogEntry* entry = new RelationCatalogEntry();
     
     int ret = relCat.getTableEntry(tableName, entry);
@@ -257,8 +268,8 @@ int QEP::execute(int coreNum) {
   auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
       end_time - start_time);
   // Print the time taken
-  std::cout << "Time taken: " << duration.count() << " milliseconds"
-            << std::endl;
+  // std::cout << "Time taken: " << duration.count() << " milliseconds"
+            // << std::endl;
 
   return duration.count();
   // return 0;

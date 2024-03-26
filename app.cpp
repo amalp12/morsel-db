@@ -60,7 +60,7 @@ int main(int argc, char **argv) {
         QEP qep(statement);
 
         // call execute on the qep object
-        qep.execute(0);
+        qep.execute();
         return 0;
         
         // create 4 threads and call exicute on each

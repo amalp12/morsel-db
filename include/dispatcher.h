@@ -17,7 +17,7 @@
 class QEP{
     public:
     static const hsql::SQLStatement * statement;
-    static std::map<hsql::Expr*, std::array<int, 16>> dependencyMap;
+    static std::map<hsql::Expr*, std::array<int, 48>> dependencyMap;
     static hsql::StatementType statementType;
     static std::queue<MorselContainer> qepQueue;
 

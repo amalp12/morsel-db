@@ -20,10 +20,10 @@ public:
   RelationCatalogEntry();
   std::string getTableName();
   std::list<Attribute> getAttributes();
-  int setTableName(std::string name);
-  int setAttributes(std::list<std::string> colNameList,
-                    std::list<int> colTypeList);
-  int setAttributes(std::list<Attribute> attributeList);
+  int setTableName(const std::string &name);
+  int setAttributes(const std::list<std::string> &colNameList,
+                    const std::list<int> &colTypeList);
+  int setAttributes(const std::list<Attribute> &attributeList);
   void clearEntry();
 };
 
@@ -32,17 +32,17 @@ private:
   static std::list<RelationCatalogEntry> catList;
 
 public:
-  static int insertNewTable(std::string name,
-                                    std::list<std::string> colNameList,
-                                    std::list<int> colTypeList);
-  static int insertNewTable(std::string name,
-                                    std::list<Attribute> attrs);
-  static int getTableEntry(std::string tableName,
+  static int insertNewTable(const std::string &name,
+                                    const std::list<std::string> &colNameList,
+                                    const std::list<int> &colTypeList);
+  static int insertNewTable(const std::string &name,
+                                    const std::list<Attribute> &attrs);
+  static int getTableEntry(const std::string &tableName,
                            RelationCatalogEntry *vesselPtr);
   static void deleteRelcat();
                            
 
-  static int appendToThreadMapMorsel(std::string tableName , int core , void * morselEntry){
+  static int appendToThreadMapMorsel(const std::string &tableName , int core , void * morselEntry){
 
    for (auto iter = catList.begin(); iter != catList.end(); iter++) {
     if (tableName == iter->getTableName()) {

@@ -1,5 +1,3 @@
-add_subdirectory(./DB)
-
 set(SOURCES morsel.cpp operators.cpp relcat.cpp parser.cpp attribute.cpp dispatcher.cpp init.cpp  lib.cpp loop_functions.cpp operators.cpp tuple.cpp test.cpp static.cpp)
 
 add_library( srclib ${SOURCES} )

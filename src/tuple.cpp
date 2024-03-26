@@ -67,10 +67,14 @@ void TupleStream::printStream() {
   // void *morselStart = m->getStartPtr();
 
   Tuple tup;
+  int entriesCount=0;
+  int morselCount=0;
   // iterate through all morsels
   while (m != NULL) {
+    morselCount++;
     // for each morsel, iterate through all entries
     for(int entryNo=0;entryNo<numEntriesFilled;entryNo++){
+      entriesCount++;
       void *entry = m->getNthMorselEntry(entryNo);
       for (auto iter = attributeList.begin(); iter != attributeList.end(); iter++) {
         void *value = tup.getTupleValue(&(*iter), entry);
@@ -91,6 +95,10 @@ void TupleStream::printStream() {
       numEntriesFilled = m->getFilledNumberOfEntries();
     }
   }
+  // print counts
+  std::cout << "Morsel Count : " << morselCount << "\n";
+  std::cout << "Entries Count : " << entriesCount << "\n";
+
 }
 void TupleStream::resetStream(){
   this->morsel=this->intitialMorsel;

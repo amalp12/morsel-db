@@ -6,7 +6,8 @@ Morsel::Morsel(int morselSize, int morselEntrySize) {
   size = morselSize;
   entrySize = morselEntrySize;
   // allocate memorygetTableName
-  startPtr = (void *)new char[morselSize];
+  // startPtr = (void *)new char[morselSize];
+  startPtr = (void *)malloc(morselSize*sizeof(char));
   nextFreeIndex = 0;
   filledEntries = 0;
 }
