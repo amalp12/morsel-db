@@ -172,6 +172,9 @@ int QEP::execute(int coreNum) {
 
       delete entry;
       delete newEntry;
+      // delete input_ts and output_ts
+      delete args.selectArgs.input_ts;
+      delete args.selectArgs.output_ts;
     }
     // std::cout << "Exiting Select ... " <<std::endl;
   }

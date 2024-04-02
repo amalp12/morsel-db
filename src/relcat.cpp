@@ -115,6 +115,7 @@ int RelationCatalog::insertNewTable(const std::string &name,
 
   // append to catList
   catList.emplace_back(*entry);
+  delete entry;
 
   return 0;
 }

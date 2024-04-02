@@ -5,14 +5,17 @@
 #include <pg_query.h>
 #include "dispatcher.h"
 #include <thread>
-#include <iostream>
 #include "test.h"
 #include <numeric>
+#include <iomanip>
+
+
 
 static void test(int argc, char** argv) {
     // staticvars
     StaticVars staticVars;
     int coreNum =1;
+    const int total_cores = 48;
     std::array<int,7> morsel_sizes {26400000, 13200000, 2640000, 1320000, 264000, 132000, 66000};
     std::string query = "select ID,Name,Age from test_table where Age > 0;";
     hsql::SQLParserResult result;
@@ -23,17 +26,17 @@ static void test(int argc, char** argv) {
         for (auto &morsel_size : morsel_sizes)
         {
             staticVars.setMaxMorselSize(morsel_size);
-            std::cout << "Morsel size:: " << morsel_size << '\n';
-            for (int i = 1; i <= 48; i++)
+            // std::cout << "Morsel size:: " << morsel_size << '\n';
+            for (int i = 1; i <= total_cores; i++)
             {
+                const int avg_num = 3;
                 staticVars.setNumberOfCores(i);
-                std::array<int,3> res;
+                std::array<float,avg_num> res;
                 
-
-                for (int t = 0; t < 3; t++)
+                for (int t = 0; t < avg_num; t++)
                 {
                     // create an array of int to store the time for each core
-                    std::array<int,48> timeArr;
+                    std::array<int,total_cores> timeArr;
                     create_table_test();
                     // test code
                     // create a local qep object
@@ -77,11 +80,12 @@ static void test(int argc, char** argv) {
                     coreNum = (coreNum + 1) % staticVars.getNumberOfCores();
                     destructRelcat();
                 }
+                
                 // std::cout << "Time for [ " << i << " ] core(s):: " << std::accumulate(res.begin(), res.end(), 0) / 3.0 << '\n';
-                std::cout << std::accumulate(res.begin(), res.end(), 0) / 3.0 << ", ";
+                std::cout <<  i << ", " << morsel_size << ", " << 800000 << ", " << std::setprecision(5) << std::accumulate(res.begin(), res.end(), 0) / 3.0 << "\n";
                 
             }
-            std::cout << '\n';
+            // std::cout << '\n';
         }
 
     }

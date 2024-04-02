@@ -25,6 +25,6 @@ def save_data_to_file(data, filename):
             f.write(';'.join(map(str, entry)) + '\n')
 
 if __name__ == "__main__":
-    num_entries = 400000
+    num_entries = 800000
     data = generate_data(num_entries)
     save_data_to_file(data, 'test_table.csv')

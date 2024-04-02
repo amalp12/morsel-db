@@ -2,3 +2,4 @@
 2. weve assumed fn_select_loop argList has column_name/offset. Need to implement this in dispatcher.
 3. make higher level of abstraction for creating morsels. currently morsels can create other morsels.(bad)
 4. conversion from parser parser op type to db op type is not fully implemented.
+5. change catList content to  pointers
