@@ -14,10 +14,11 @@
 static void test(int argc, char** argv) {
     // staticvars
     StaticVars staticVars;
+    createTableMetaAndRows();
     int coreNum =1;
     const int total_cores = 48;
     std::array<int,7> morsel_sizes {26400000, 13200000, 2640000, 1320000, 264000, 132000, 66000};
-    std::string query = "select ID,Name,Age from test_table where Age > 0;";
+    std::string query = "select Column_1 from test_table where Column_1 > 0;";
     hsql::SQLParserResult result;
     hsql::SQLParser::parse(query, &result);
     if (result.isValid() && result.size() > 0 ) {
@@ -27,17 +28,24 @@ static void test(int argc, char** argv) {
         {
             staticVars.setMaxMorselSize(morsel_size);
             // std::cout << "Morsel size:: " << morsel_size << '\n';
+
+            
+
             for (int i = 1; i <= total_cores; i++)
             {
                 const int avg_num = 3;
                 staticVars.setNumberOfCores(i);
                 std::array<float,avg_num> res;
+
+                // create_table_test();
+                // create_table_test_random();
                 
                 for (int t = 0; t < avg_num; t++)
                 {
+                    loadPrevTable();
                     // create an array of int to store the time for each core
                     std::array<int,total_cores> timeArr;
-                    create_table_test();
+                    
                     // test code
                     // create a local qep object
 

@@ -6,7 +6,7 @@ hsql::StatementType QEP::statementType;
 std::queue<MorselContainer> QEP::qepQueue;
 // Dispatcher DISPATCHER;
 // QEP QEPObject ;
-
+// SELECT table1.column1,table1.column2,table2.column1 FROM table1 INNER JOIN table2 ON table1.matching_column = table2.matching_column;
 int QEP::assignDependancies(int coreNum) {
   if (statementType == hsql::kStmtSelect) {
     const hsql::SelectStatement *selectStatement =
@@ -163,10 +163,10 @@ int QEP::execute(int coreNum) {
       // print the output tuple stream for debugging
       // args.selectArgs.output_ts->printStream();
 
-      // std::string output_file_name = "/home/ssl/Code/db/out/output_" +
-                                    //  entry->getTableName() + "_" +
-                                    //  std::to_string(coreNum) + ".txt";
-      // args.selectArgs.output_ts->writeStream(output_file_name);
+      std::string output_file_name = "/home/ssl/Code/db/out/output_" +
+                                     entry->getTableName() + "_" +
+                                     std::to_string(coreNum) + ".txt";
+      args.selectArgs.output_ts->writeStream(output_file_name);
 
       // peda gdb
 
@@ -272,7 +272,7 @@ int QEP::execute(int coreNum) {
       end_time - start_time);
   // Print the time taken
   // std::cout << "Time taken: " << duration.count() << " milliseconds"
-            // << std::endl;
+  //           << std::endl;
 
   return duration.count();
   // return 0;

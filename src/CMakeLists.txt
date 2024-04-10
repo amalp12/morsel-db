@@ -4,5 +4,12 @@ add_library( srclib ${SOURCES} )
 # add_executable(dbapp app.cpp)
 add_executable(dbapp app.cpp)
 
-target_link_libraries(dbapp /usr/local/lib/libsqlparser.so /usr/local/lib/libpg_query.so)
+if(CMAKE_BUILD_TYPE MATCHES "Debug")
+    target_link_libraries(dbapp /usr/local/lib/libsqlparser_debug.so )
+    # target_link_libraries(your_target_name debug debug_library_name)
+elseif(CMAKE_BUILD_TYPE MATCHES "Release")
+    target_link_libraries(dbapp /usr/local/lib/libsqlparser_release.so )
+    # target_link_libraries(your_target_name optimized release_library_name)
+endif()
+
 target_link_libraries(dbapp srclib )

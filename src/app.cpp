@@ -1,7 +1,6 @@
 #include <hsql/SQLParser.h>
 #include <hsql/util/sqlhelper.h>
 #include <iostream>
-#include <pg_query.h>
 #include "dispatcher.h"
 #include <thread>
 #include "test.h"
@@ -14,14 +13,23 @@ int main(int argc, char **argv) {
   // create staticVars
   StaticVars staticVars;
   // set cores and morsel size
-  staticVars.setNumberOfCores(10);
+  staticVars.setNumberOfCores(4);
 
   staticVars.setMaxMorselSize(264000);  
   // create_table_test();
   while (true) {
-    create_table_test();
+    // create_table_test();
+    create_table_test_random();
     try {
+
+     
+      
       std::cout << "Enter your query: ";
+
+       // flush 
+      std::cout.flush();
+      std::cin.clear();
+      
       // SELECT Name, ID, Age from test_table WHERE Age > 0;
       std::string query;
       std::getline(std::cin, query);
@@ -41,10 +49,12 @@ int main(int argc, char **argv) {
 
         // print the enum constant
         // std::cout << "Statement Greater: " << hsql::kOpGreater << std::endl;
+        std::cout << "Statement one " << std::endl;
         parseSelectStatement(statement);
+        // SELECT table1.column1,table1.column2,table2.column1 FROM table1  FULL JOIN table2 ON table1.matching_column = table2.matching_column;
         // test code
         // create a local qep object
-       
+        /*
         QEP qep(statement);
 
         // call execute on the qep object
@@ -78,14 +88,14 @@ int main(int argc, char **argv) {
         }
 
         coreNum =  (coreNum + 1)%numberOfCores;
-        
+          
 
         // if (statement->isType(hsql::kStmtSelect)) {
         //   const auto *select =
         //       static_cast<const hsql::SelectStatement *>(statement);
         //   hsql::printStatementInfo(statement);
-        //   /* ... */
         // }
+        */
       }
 
       // PgQueryParseResult result2;
