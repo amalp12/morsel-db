@@ -1,4 +1,4 @@
-#include "init.h"
+#include "dispatcher.h"
 
 int init(){
     // create a global qep  object

@@ -1,5 +1,11 @@
 #include "test.h"
 #include <cstdlib>
+#include <random>
+#include <fstream>
+#include <iostream>
+#include <algorithm>
+#include <string>
+#include <sstream>
 
 // destructMorsel
 void destructRelcat(){
@@ -22,7 +28,7 @@ void initMorsel(int core , std::string tableName , int start_index , int end_ind
 {
     RelationCatalog relCat;
     Row* destination = new Row();
-    std::string codebase = get_env_var("CODEBASE");
+    std::string codebase = get_env_var("ROOTDIR");
     std::ifstream file(codebase + "/in/test_table.csv");
 
     if (!file.is_open()) {
@@ -91,7 +97,8 @@ int create_table_test(){
     // initMorsel(0 , tableName);
     //Create threads
     std::vector<std::thread> threads;
-    const std::string filename("/home/ssl/morsel-db/in/test_table.csv");
+    std::string filename = get_env_var("ROOTDIR") + "/in/test_table.csv";
+
     std::ifstream file(filename);
     int total_lines = std::count(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>(), '\n');
     int lines_per_thread = total_lines / staticVars.getNumberOfCores();
@@ -137,7 +144,7 @@ int create_table_test_random(){
     }
 
     //store meta data of table generated
-    std::string tableMetaDataFile = "/home/ssl/Code/db/in/test_table_meta_data.txt";
+    std::string tableMetaDataFile= get_env_var("ROOTDIR") + "/in/test_table_meta_data.txt";
     std::ofstream outFile(tableMetaDataFile , std::ios_base::out);
     outFile<<"Table Name:" <<tableName<<"\n";
     
@@ -156,7 +163,7 @@ int create_table_test_random(){
     // initMorsel(0 , tableName);
     //Create threads
     std::vector<std::thread> threads;
-    const std::string filename("/home/ssl/Code/db/in/test_table.csv");
+    std::string filename = get_env_var("ROOTDIR") + "/in/test_table.csv";
     std::ifstream file(filename);
     int total_lines = std::count(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>(), '\n');
     int lines_per_thread = total_lines / staticVars.getNumberOfCores();
@@ -197,7 +204,8 @@ void initMorselRandom(int core , std::string tableName , int start_index , int e
     int integerAttr;
     char stringAttr[STRING_SIZE];
 
-    std::ifstream file("/home/ssl/Code/db/in/test_table.csv");
+    std::string filename = get_env_var("ROOTDIR") + "/in/test_table.csv";
+    std::ifstream file(filename);
 
     if (!file.is_open()) {
         std::cerr << "Failed to open file!" << std::endl;
@@ -247,7 +255,9 @@ void initMorselRandom(int core , std::string tableName , int start_index , int e
 
 void insertRowsRandom(std::list<int> colTypeList)
 {
-   std::ofstream outFile("/home/ssl/Code/db/in/test_table.csv", std::ios_base::out);
+
+    std::string filename = get_env_var("ROOTDIR") + "/in/test_table.csv";
+   std::ofstream outFile(filename, std::ios_base::out);
    std::random_device rd;
    std::mt19937 gen(rd());
    std::uniform_int_distribution<int> distribution(10000, 100000);
@@ -304,7 +314,7 @@ void createTableMetaAndRows()
     }
 
     //store meta data of table generated
-    std::string tableMetaDataFile = "/home/ssl/Code/db/in/test_table_meta_data.txt";
+    std::string tableMetaDataFile = get_env_var("ROOTDIR") + "/in/test_table_meta_data.txt";
     std::ofstream outFile(tableMetaDataFile , std::ios_base::out);
     outFile<<"Table Name:" <<tableName<<"\n";
     
@@ -323,7 +333,7 @@ void createTableMetaAndRows()
 
 void loadPrevTable()
 {
-    std::string tableMetaDataFile = "/home/ssl/Code/db/in/test_table_meta_data.txt";
+    std::string tableMetaDataFile = get_env_var("ROOTDIR") + "/in/test_table_meta_data.txt";
     std::ifstream inFile(tableMetaDataFile);
     if (!inFile.is_open()) {
         std::cerr << "Error opening file: " << tableMetaDataFile << std::endl;
@@ -356,7 +366,7 @@ void loadPrevTable()
 
     //Create threads
     std::vector<std::thread> threads;
-    const std::string filename("/home/ssl/Code/db/in/test_table.csv");
+    std::string filename = get_env_var("ROOTDIR") + "/in/test_table.csv";
     std::ifstream file(filename);
     int total_lines = std::count(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>(), '\n');
     int lines_per_thread = total_lines / staticVars.getNumberOfCores();

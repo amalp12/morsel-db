@@ -1,3 +1,4 @@
+#include "constants.h"
 #include "attribute.h"
 int getAttributeSizeFromType(int type) {
   switch (type) {

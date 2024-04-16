@@ -1,4 +1,5 @@
 #include "operators.h"
+#include "lib.h"
 
 TupleStream *Operator::scan(Morsel *tableHeadMorsel,
                             std::list<std::string> colNames,

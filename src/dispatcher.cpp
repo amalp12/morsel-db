@@ -1,4 +1,7 @@
 #include "dispatcher.h"
+#include "relcat.h"
+#include <chrono>
+#include "loop_functions.h"
 
 const hsql::SQLStatement *QEP::statement;
 std::map<hsql::Expr *, std::array<int, 48>> QEP::dependencyMap;
@@ -153,7 +156,7 @@ int QEP::execute(int coreNum) {
       args.selectArgs.op = hsql::kOpGreater ? GREATER_THAN : LESS_THAN;
       args.selectArgs.entrySize = lhsAttr.size;
 
-      // fn_select_loop(args);
+      // ggfn_select_loop(args);
 
       // print the input tuple stream for debugging
       // args.selectArgs.input_ts->printStream();

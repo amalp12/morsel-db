@@ -1,4 +1,6 @@
 #include "lib.h"
+#include "constants.h"
+#include <iostream>
 
 bool compareInt(int value1, int value2, int operatorType)
 {
