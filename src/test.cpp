@@ -1,4 +1,5 @@
 #include "test.h"
+#include <cstdlib>
 
 // destructMorsel
 void destructRelcat(){
@@ -8,12 +9,21 @@ void destructRelcat(){
     relCat.deleteRelcat();
     
 }
-
+std::string get_env_var( std::string const & key ) {                                 
+    char * val;                                                                        
+    val = std::getenv( key.c_str() );                                                       
+    std::string retval = "";                                                           
+    if (val != NULL) {                                                                 
+        retval = val;                                                                    
+    }                                                                                  
+    return retval;                                                                        
+}  
 void initMorsel(int core , std::string tableName , int start_index , int end_index)
 {
     RelationCatalog relCat;
     Row* destination = new Row();
-    std::ifstream file("/home/ssl/Code/db/in/test_table.csv");
+    std::string codebase = get_env_var("CODEBASE");
+    std::ifstream file(codebase + "/in/test_table.csv");
 
     if (!file.is_open()) {
         std::cerr << "Failed to open file!" << std::endl;
@@ -81,7 +91,7 @@ int create_table_test(){
     // initMorsel(0 , tableName);
     //Create threads
     std::vector<std::thread> threads;
-    const std::string filename("/home/ssl/Code/db/in/test_table.csv");
+    const std::string filename("/home/ssl/morsel-db/in/test_table.csv");
     std::ifstream file(filename);
     int total_lines = std::count(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>(), '\n');
     int lines_per_thread = total_lines / staticVars.getNumberOfCores();

@@ -163,7 +163,7 @@ int QEP::execute(int coreNum) {
       // print the output tuple stream for debugging
       // args.selectArgs.output_ts->printStream();
 
-      std::string output_file_name = "/home/ssl/Code/db/out/output_" +
+      std::string output_file_name = "/home/ssl/morsel-db/out/output_" +
                                      entry->getTableName() + "_" +
                                      std::to_string(coreNum) + ".txt";
       args.selectArgs.output_ts->writeStream(output_file_name);

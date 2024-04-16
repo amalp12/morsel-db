@@ -1,5 +1,4 @@
 #pragma once
-#include "constants.h"
 #include <string>
 struct Attribute {
   std::string name;

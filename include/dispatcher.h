@@ -3,15 +3,8 @@
 #include <hsql/SQLParser.h>
 #include <hsql/util/sqlhelper.h>
 #include <map>
-#include "constants.h"
-#include <pg_query.h>
 #include <queue>
-#include <string>
-#include <list>
 #include "morsel.h"
-#include "relcat.h"
-#include "loop_functions.h"
-#include <chrono>
 
 
 class QEP{

@@ -1,14 +1,8 @@
 #pragma once
-#include "static.h"
 #include <threads.h>
-#include "morsel.h"
 #include <cstring>
-#include <iostream>
-#include <fstream>
-#include <sstream>
 #include <list>
-#include <algorithm>
-#include <random>
+#include <string>
 
 
 struct Row {
@@ -33,3 +27,5 @@ void insertRowsRandom(std::list<int> colTypeList);
 void initMorselRandom(int core , std::string tableName , int start_index , int end_index);
 
 int create_table_test_random();
+
+std::string get_env_var( std::string const & key );                                 

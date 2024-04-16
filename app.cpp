@@ -1,7 +1,6 @@
 #include <hsql/SQLParser.h>
 #include <hsql/util/sqlhelper.h>
 #include <iostream>
-#include <pg_query.h>
 #include "dispatcher.h"
 #include <thread>
 #include "test.h"
