@@ -2,8 +2,8 @@
 #include <hsql/util/sqlhelper.h>
 #include <iostream>
 #include "dispatcher.h"
-#include <thread>
 #include "test.h"
+
 void parseSelectStatement(const hsql::SQLStatement* statement) {
     if (statement->type() == hsql::kStmtSelect) {
         const auto* selectStatement = static_cast<const hsql::SelectStatement*>(statement);

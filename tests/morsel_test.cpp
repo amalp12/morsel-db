@@ -22,7 +22,7 @@ static void test(int argc, char** argv) {
     hsql::SQLParser::parse(query, &result);
     if (result.isValid() && result.size() > 0 ) {
         const hsql::SQLStatement *statement = result.getStatement(0);
-        parseSelectStatement(statement);
+        // parseSelectStatement(statement);
         for (auto &morsel_size : morsel_sizes)
         {
             staticVars.setMaxMorselSize(morsel_size);
