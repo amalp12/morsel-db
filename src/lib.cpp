@@ -25,7 +25,9 @@ bool compareInt(int value1, int value2, int operatorType)
 
 bool compareStr(char *value1, char *value2, int entrySize, int operatorType)
 {
-  int isEqual = std::memcmp((void *)value1, (void *)value2, (size_t)entrySize);
+  // int isEqual = std::memcmp((void *)value1, (void *)value2, (size_t)STRING_SIZE);
+  // compare strings using strcmp
+  int isEqual = std::strcmp(value1, value2);
 
   switch (operatorType)
   {
@@ -73,6 +75,14 @@ void parseSelectStatement(const hsql::SQLStatement *statement)
   if (statement->type() == hsql::kStmtSelect)
   {
     const auto *selectStatement = static_cast<const hsql::SelectStatement *>(statement);
+
+    // if statement is a join statement
+    if(selectStatement->fromTable != nullptr && selectStatement->fromTable->type == hsql::kTableJoin)
+    {
+      const auto *joinTable = selectStatement->fromTable->join;
+      std::cout << "Join Table: " << joinTable->left->name << " " << joinTable->right->name << std::endl;
+      std::cout << "Join Condition Operator Type: " << joinTable->condition->opType << std::endl;
+    }
     // Parse columns
     for (const auto *column : *selectStatement->selectList)
     {

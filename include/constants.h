@@ -17,6 +17,12 @@ enum ColumnSize {
     FLOAT_SIZE = 4
 };
 
+// success and failure
+enum Status {
+    SUCCESS,
+    FAILURE
+};
+
 // comparison operators
 enum ComparisonOperator {
     EQUAL,
@@ -28,7 +34,8 @@ enum ComparisonOperator {
 };
 
 enum FUNCTION_IDENTIFIERS {
-    SELECT_FN_IDENTIFER
+    SELECT_FN_IDENTIFER,
+    JOIN_FN_IDENTIFIER
 };
 
 

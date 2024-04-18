@@ -19,12 +19,15 @@ int main(int argc, char **argv) {
   // create_table_test();
   while (true) {
     // create_table_test();
-    create_table_test_random();
+    std::string table1 = "Table_A";
+    std::string table2 = "Table_B";
+    create_table_test_random(table1);
+    create_table_test_random(table2);
     try {
 
      
       
-      std::cout << "Enter your query: ";
+      std::cout << "Enter your query: "<<std::endl;
 
        // flush 
       std::cout.flush();
@@ -49,12 +52,12 @@ int main(int argc, char **argv) {
 
         // print the enum constant
         // std::cout << "Statement Greater: " << hsql::kOpGreater << std::endl;
-        std::cout << "Statement one " << std::endl;
-        parseSelectStatement(statement);
+        // std::cout << "Statement one " << std::endl;
+        // parseSelectStatement(statement);
         // SELECT table1.column1,table1.column2,table2.column1 FROM table1  FULL JOIN table2 ON table1.matching_column = table2.matching_column;
         // test code
         // create a local qep object
-        /*
+        
         QEP qep(statement);
 
         // call execute on the qep object
@@ -95,7 +98,7 @@ int main(int argc, char **argv) {
         //       static_cast<const hsql::SelectStatement *>(statement);
         //   hsql::printStatementInfo(statement);
         // }
-        */
+        
       }
 
       // PgQueryParseResult result2;

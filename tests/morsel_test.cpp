@@ -13,7 +13,8 @@
 static void test(int argc, char** argv) {
     // staticvars
     StaticVars staticVars;
-    createTableMetaAndRows();
+    std::string tableName = "test_table";
+    createTableMetaAndRows(tableName);
     int coreNum =1;
     const int total_cores = 48;
     std::array<int,7> morsel_sizes {26400000, 13200000, 2640000, 1320000, 264000, 132000, 66000};

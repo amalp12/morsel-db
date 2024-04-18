@@ -12,6 +12,3 @@ int getAttributeSizeFromType(int type) {
     return 0;
   }
 }
-
-
-

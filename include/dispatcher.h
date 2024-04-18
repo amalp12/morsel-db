@@ -29,6 +29,13 @@ class QEP{
 
     // fill independent morsel to the dispatcher queue until its filled and exit
     static int execute(int coreNum);
+    static int handleNameSelect(int coreNum, const hsql::SelectStatement *selectStatement);
+
+    static int handleCreateTable(int coreNum);
+    static int handleInsert(int coreNum);
+    static int handleSelect(int coreNum);
+    static int handleJoin(int coreNum, const hsql::SelectStatement *selectStatement);
+
 
    
 };

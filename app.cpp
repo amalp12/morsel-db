@@ -1,3 +1,5 @@
+#include "dispatcher.h"
+#include "test.h"
 #include <hsql/SQLParser.h>
 #include <hsql/util/sqlhelper.h>
 #include <iostream>
@@ -16,23 +18,24 @@ void parseSelectStatement(const hsql::SQLStatement* statement) {
         }
         std::cout << std::endl;
 
-        if (selectStatement->fromTable != nullptr) {
-            std::cout << "Table: " << selectStatement->fromTable->name << std::endl;
-        }
-
-        if (selectStatement->whereClause != nullptr) {
-            std::cout << "WHERE: \n"; ;hsql::printExpression(selectStatement->whereClause, 1);
-        }
+    if (selectStatement->fromTable != nullptr) {
+      std::cout << "Table: " << selectStatement->fromTable->name << std::endl;
     }
+
+    if (selectStatement->whereClause != nullptr) {
+      std::cout << "WHERE: \n";
+      ;
+      hsql::printExpression(selectStatement->whereClause, 1);
+    }
+  }
 }
 
 int main(int argc, char **argv) {
 
-
   create_table_test();
   while (true) {
     try {
-      std::cout << "Enter your query: ";
+      std::cout << "Enter your query: " <<std::endl;
       // SELECT ID, Name, Age FROM test_table WHERE Age > 0;
       std::string query;
       std::getline(std::cin, query);
@@ -59,14 +62,14 @@ int main(int argc, char **argv) {
         QEP qep(statement);
 
         // call execute on the qep object
-        qep.execute();
+        qep.execute(0);
         return 0;
-        
+
         // create 4 threads and call exicute on each
         // std::vector<std::thread> threads;
         // for (int i = 0; i < 4; i++) {
-          // threads.push_back(std::thread(&QEP::execute, &qep, i));
-          // threads[i].join();
+        // threads.push_back(std::thread(&QEP::execute, &qep, i));
+        // threads[i].join();
         // }
 
         // if (statement->isType(hsql::kStmtSelect)) {

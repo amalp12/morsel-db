@@ -20,7 +20,7 @@ class Operator {
     static int scatter(void * tuple, Morsel * morsel, std::list<Attribute> attributeList);
 
     //loop : for each tuple in the tuple stream, apply the function that returns a bool until it returns false
-    static void loop(std::function<bool(union LoopFnArgs args)>  fn, union LoopFnArgs args);
+    static void loop(std::function<bool(union LoopFnArgs args)>  fn, union LoopFnArgs args, int functionIdentifier);
     
     // map
 };
