@@ -1,4 +1,4 @@
-# CMake
+g CMake
 CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
@@ -6,6 +6,7 @@ compile_commands.json
 Makefile
 install_manifest.txt
 in/
+out/
 .cache/
 
 # Compiled binaries

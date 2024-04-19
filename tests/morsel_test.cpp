@@ -20,6 +20,7 @@ static void test(int argc, char** argv) {
     std::string query = "select Column_1 from test_table where Column_1 > 0;";
     hsql::SQLParserResult result;
     hsql::SQLParser::parse(query, &result);
+    auto table_size = get_env_var("TEST_TABLE_SIZE");
     if (result.isValid() && result.size() > 0 ) {
         const hsql::SQLStatement *statement = result.getStatement(0);
         // parseSelectStatement(statement);
@@ -87,9 +88,7 @@ static void test(int argc, char** argv) {
                     coreNum = (coreNum + 1) % staticVars.getNumberOfCores();
                     destructRelcat();
                 }
-                
-                // std::cout << "Time for [ " << i << " ] core(s):: " << std::accumulate(res.begin(), res.end(), 0) / 3.0 << '\n';
-                std::cout <<  i << ", " << morsel_size << ", " << 800000 << ", " << std::setprecision(5) << std::accumulate(res.begin(), res.end(), 0) / 3.0 << "\n";
+                std::cout <<  i << ", " << morsel_size << ", " << table_size<< ", " << std::setprecision(5) << std::accumulate(res.begin(), res.end(), 0) / 3.0 << "\n";
                 
             }
             // std::cout << '\n';
