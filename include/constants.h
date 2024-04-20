@@ -3,6 +3,16 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+// b plus tree max key size
+enum B_PLUS_TREE {
+    MAX_B_PLUS_TREE_KEYS = 3 // Maximum number of keys in a node
+};
+
+enum B_PLUS_TREE_NODE_TYPE {
+    LEAF_NODE,
+    INTERNAL_NODE
+};
+
 // constants for types
 enum ColumnType {
     INTEGER,
