@@ -169,7 +169,7 @@ int QEP::execute(int coreNum) {
       std::string output_file_name = "/home/ssl/morsel-db/out/output_" +
                                      entry->getTableName() + "_" +
                                      std::to_string(coreNum) + ".txt";
-      args.selectArgs.output_ts->writeStream(output_file_name);
+      // args.selectArgs.output_ts->writeStream(output_file_name);
 
       // peda gdb
 
