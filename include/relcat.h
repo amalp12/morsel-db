@@ -1,14 +1,12 @@
 #ifndef RELCAT_H
 #define RELCAT_H
+#include "attribute.h"
+#include "morsel.h"
 #include "static.h"
 #include <constants.h>
 #include <iostream>
+#include <list>
 #include <map>
-#include <list>
-#include <list>
-#include "attribute.h"
-#include "morsel.h"
-
 
 class RelationCatalogEntry {
 private:
@@ -33,26 +31,26 @@ private:
 
 public:
   static int insertNewTable(const std::string &name,
-                                    const std::list<std::string> &colNameList,
-                                    const std::list<int> &colTypeList);
+                            const std::list<std::string> &colNameList,
+                            const std::list<int> &colTypeList);
   static int insertNewTable(const std::string &name,
-                                    const std::list<Attribute> &attrs);
+                            const std::list<Attribute> &attrs);
   static int getTableEntry(const std::string &tableName,
                            RelationCatalogEntry *vesselPtr);
   static void deleteRelcat();
-                           
 
-  static int appendToThreadMapMorsel(const std::string &tableName , int core , void * morselEntry){
+  static int appendToThreadMapMorsel(const std::string &tableName, int core,
+                                     void *morselEntry) {
 
-   for (auto iter = catList.begin(); iter != catList.end(); iter++) {
-    if (tableName == iter->getTableName()) {
-      iter->threadMap[core]->insertEntry(morselEntry);
+    for (auto iter = catList.begin(); iter != catList.end(); iter++) {
+      if (tableName == iter->getTableName()) {
+        iter->threadMap[core]->insertEntry(morselEntry);
+      }
     }
-   }
     return 0;
   }
 };
 
 // Global variable referencing the relcat object
-//extern RelationCatalog RELCAT;
+// extern RelationCatalog RELCAT;
 #endif

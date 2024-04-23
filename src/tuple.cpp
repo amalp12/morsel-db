@@ -1,33 +1,28 @@
 #include "tuple.h"
 
-
 // get tuple value from attribute
-void* Tuple::getTupleValue(Attribute * attr, void *tuple) {
-  void * val  = (void *)((char *)tuple + attr->offset);
+void *Tuple::getTupleValue(Attribute *attr, void *tuple) {
+  void *val = (void *)((char *)tuple + attr->offset);
   return val;
 }
-
 
 // constructor
 
 TupleStream::TupleStream(RelationCatalogEntry *relEntry, int coreNum) {
   this->morsel = relEntry->threadMap[coreNum];
-  this-> intitialMorsel=this->morsel;
+  this->intitialMorsel = this->morsel;
 
   this->currentIndex = 0;
   this->entrySize = this->morsel->getEntrySize();
   this->morselStart = morsel->getStartPtr();
-  
 
   // set attributes
   this->attributeList = relEntry->getAttributes();
-
-  
 }
 
 TupleStream::TupleStream(Morsel *morsel, std::list<std::string> colNameList,
-                                       std::list<int> colTypeList) {
-  this->intitialMorsel=morsel;
+                         std::list<int> colTypeList) {
+  this->intitialMorsel = morsel;
   this->morsel = morsel;
   this->currentIndex = 0;
   this->entrySize = 0;
@@ -36,15 +31,14 @@ TupleStream::TupleStream(Morsel *morsel, std::list<std::string> colNameList,
   // set attributes
   this->setAttributes(colNameList, colTypeList);
 
-
   // calculate entry size
-  for (auto iter = attributeList.begin() ; iter != attributeList.end(); iter++) {
+  for (auto iter = attributeList.begin(); iter != attributeList.end(); iter++) {
     this->entrySize += (*iter).size;
   }
 }
 
 void TupleStream::printStream() {
-  
+
   // reset the tuple stream
   this->resetStream();
   Morsel *m = morsel;
@@ -67,16 +61,17 @@ void TupleStream::printStream() {
   // void *morselStart = m->getStartPtr();
 
   Tuple tup;
-  int entriesCount=0;
-  int morselCount=0;
+  int entriesCount = 0;
+  int morselCount = 0;
   // iterate through all morsels
   while (m != NULL) {
     morselCount++;
     // for each morsel, iterate through all entries
-    for(int entryNo=0;entryNo<numEntriesFilled;entryNo++){
+    for (int entryNo = 0; entryNo < numEntriesFilled; entryNo++) {
       entriesCount++;
       void *entry = m->getNthMorselEntry(entryNo);
-      for (auto iter = attributeList.begin(); iter != attributeList.end(); iter++) {
+      for (auto iter = attributeList.begin(); iter != attributeList.end();
+           iter++) {
         void *value = tup.getTupleValue(&(*iter), entry);
         if (iter->type == INTEGER) {
           std::cout << *(int *)value << " ";
@@ -90,18 +85,16 @@ void TupleStream::printStream() {
     }
 
     m = m->getNext();
-    if(m != nullptr)
-    {
+    if (m != nullptr) {
       numEntriesFilled = m->getFilledNumberOfEntries();
     }
   }
   // print counts
   std::cout << "Morsel Count : " << morselCount << "\n";
   std::cout << "Entries Count : " << entriesCount << "\n";
-
 }
-void TupleStream::resetStream(){
-  this->morsel=this->intitialMorsel;
+void TupleStream::resetStream() {
+  this->morsel = this->intitialMorsel;
   this->currentIndex = 0;
   this->morselStart = morsel->getStartPtr();
 }
@@ -111,10 +104,10 @@ void *ReadTupleStream::yieldNext() {
   // if current morsel is exhausted, move to next morsel
   if (currentIndex >= morsel->getFilledNumberOfEntries()) {
     morsel = morsel->getNext();
-   // if no more morsels or current morsel is null, return NULL
+    // if no more morsels or current morsel is null, return NULL
     if (morsel == NULL) {
       return NULL;
-    } 
+    }
     morselStart = morsel->getStartPtr();
     currentIndex = 0;
   }
@@ -125,57 +118,51 @@ void *ReadTupleStream::yieldNext() {
   }
   // perform artihmetic to get the next tuple
   void *ret = (void *)((char *)morselStart + (this->currentIndex * entrySize));
-  
 
   this->currentIndex++;
   return ret;
 }
 
-
-int WriteTupleStream::insert(void * tuple) {
+int WriteTupleStream::insert(void *tuple) {
 
   // get current morsel and check if its exhasuted
-    // if yes
-      // create new morsel assign next and reassgin morsel to new morsel
-    // insert into morsel
+  // if yes
+  // create new morsel assign next and reassgin morsel to new morsel
+  // insert into morsel
 
   // return sucess
 
   // if current morsel is exhausted, move to next morsel
   morsel->insertEntry(tuple);
 
-  if (currentIndex >= morsel->getTotalNumberOfEntries()) {   
+  if (currentIndex >= morsel->getTotalNumberOfEntries()) {
     morsel = morsel->getNext();
     morselStart = morsel->getStartPtr();
     currentIndex = 0;
   }
 
   this->currentIndex++;
-  return 1;   
+  return 1;
 }
 
-
-
-std::list<Attribute> TupleStream::getAttributeList() {
-  return attributeList;
-}
+std::list<Attribute> TupleStream::getAttributeList() { return attributeList; }
 
 int TupleStream::setAttributes(std::list<std::string> colNameList,
-                                       std::list<int> colTypeList) {
-  
+                               std::list<int> colTypeList) {
+
   auto iter_colNameList = colNameList.begin();
   auto iter_colTypeList = colTypeList.begin();
   auto iter = attributeList.begin();
   int index = 0;
-  while(iter_colNameList != colNameList.end() && iter_colTypeList != colTypeList.end())
-  {
+  while (iter_colNameList != colNameList.end() &&
+         iter_colTypeList != colTypeList.end()) {
     Attribute attr;
     attr.name = *iter_colNameList;
     attr.type = *iter_colTypeList;
     attr.size = getAttributeSizeFromType(*iter_colTypeList);
-    if(index == 0){
+    if (index == 0) {
       attr.offset = 0;
-    }else{
+    } else {
       attr.offset = attributeList.back().offset + attributeList.back().size;
     }
     attr.attributeIndex = index;
@@ -188,13 +175,10 @@ int TupleStream::setAttributes(std::list<std::string> colNameList,
   return 0;
 }
 
-int TupleStream::getEntrySize(){
-  return this->entrySize;
-}
+int TupleStream::getEntrySize() { return this->entrySize; }
 
-void TupleStream::writeStream(std::string filename)
-{
-  
+void TupleStream::writeStream(std::string filename) {
+
   std::ofstream file;
   // open file
   file.open(filename);
@@ -206,7 +190,7 @@ void TupleStream::writeStream(std::string filename)
   std::list<Attribute> attributeList = getAttributeList();
   // get entry size
   // int entrySize = 0;
-  for (auto iter = attributeList.begin() ; iter != attributeList.end() ; iter++) {
+  for (auto iter = attributeList.begin(); iter != attributeList.end(); iter++) {
     // entrySize += attributeList[i].size;
     // append  attribute name
     file << iter->name << " ";
@@ -223,9 +207,10 @@ void TupleStream::writeStream(std::string filename)
   // iterate through all morsels
   while (m != NULL) {
     // for each morsel, iterate through all entries
-    for(int entryNo=0;entryNo<numEntriesFilled;entryNo++){
+    for (int entryNo = 0; entryNo < numEntriesFilled; entryNo++) {
       void *entry = m->getNthMorselEntry(entryNo);
-      for (auto iter = attributeList.begin() ; iter != attributeList.end() ; iter++) {
+      for (auto iter = attributeList.begin(); iter != attributeList.end();
+           iter++) {
         Attribute attr = *iter;
         void *value = tup.getTupleValue(&attr, entry);
         if (attr.type == INTEGER) {
@@ -236,17 +221,16 @@ void TupleStream::writeStream(std::string filename)
           file << (char *)value << " ";
         }
         // else append ERROR
-        else{
-          file << "ERROR!FIXME" << " ";
-        
+        else {
+          file << "ERROR!FIXME"
+               << " ";
         }
       }
       file << '\n';
     }
 
     m = m->getNext();
-    if(m != nullptr)
-    {
+    if (m != nullptr) {
       numEntriesFilled = m->getFilledNumberOfEntries();
     }
   }

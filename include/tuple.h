@@ -1,21 +1,21 @@
 #pragma once
+#include "attribute.h"
 #include "constants.h"
 #include "morsel.h"
-#include <string>
-#include <list>
-#include "attribute.h"
 #include "relcat.h"
 #include <fstream>
+#include <list>
+#include <string>
 
-//static class for tuple operations
-class Tuple{
+// static class for tuple operations
+class Tuple {
 public:
-     void * getTupleValue(Attribute *attr, void *tuple);
+  void *getTupleValue(Attribute *attr, void *tuple);
 };
 
 class TupleStream {
 protected:
-  Morsel * intitialMorsel;
+  Morsel *intitialMorsel;
   Morsel *morsel;
   void *morselStart;
   std::list<Attribute> attributeList;
@@ -23,9 +23,8 @@ protected:
   int currentIndex;
 
 public:
-  TupleStream(Morsel *morsel, 
-            std::list<std::string> colNameList,
-                                       std::list<int> colTypeList);
+  TupleStream(Morsel *morsel, std::list<std::string> colNameList,
+              std::list<int> colTypeList);
   TupleStream(RelationCatalogEntry *relEntry, int coreNum);
 
   void printStream();
@@ -34,38 +33,27 @@ public:
 
   std::list<Attribute> getAttributeList();
   int setAttributes(std::list<std::string> colNameList,
-                                       std::list<int> colTypeList);
+                    std::list<int> colTypeList);
 
   int getEntrySize();
 };
 
-
-class ReadTupleStream: public TupleStream{
-  public:
-    ReadTupleStream(Morsel *morsel, 
-            std::list<std::string> colNameList,
-                                       std::list<int> colTypeList) : TupleStream(morsel, colNameList, colTypeList){
-      
-    }
-    ReadTupleStream(RelationCatalogEntry *relEntry, int coreNum) :  TupleStream(relEntry, coreNum){
-
-    }
-    void *yieldNext();
-
+class ReadTupleStream : public TupleStream {
+public:
+  ReadTupleStream(Morsel *morsel, std::list<std::string> colNameList,
+                  std::list<int> colTypeList)
+      : TupleStream(morsel, colNameList, colTypeList) {}
+  ReadTupleStream(RelationCatalogEntry *relEntry, int coreNum)
+      : TupleStream(relEntry, coreNum) {}
+  void *yieldNext();
 };
 
-
-class WriteTupleStream: public TupleStream{
-  public:
-    WriteTupleStream(Morsel *morsel, 
-            std::list<std::string> colNameList,
-                                       std::list<int> colTypeList) : TupleStream(morsel, colNameList, colTypeList){
-      
-    }
-    WriteTupleStream(RelationCatalogEntry *relEntry, int coreNum) :  TupleStream(relEntry, coreNum){
-      
-    }
-  int insert(void * tuple);
-
-
+class WriteTupleStream : public TupleStream {
+public:
+  WriteTupleStream(Morsel *morsel, std::list<std::string> colNameList,
+                   std::list<int> colTypeList)
+      : TupleStream(morsel, colNameList, colTypeList) {}
+  WriteTupleStream(RelationCatalogEntry *relEntry, int coreNum)
+      : TupleStream(relEntry, coreNum) {}
+  int insert(void *tuple);
 };

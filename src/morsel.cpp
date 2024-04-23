@@ -7,7 +7,7 @@ Morsel::Morsel(int morselSize, int morselEntrySize) {
   entrySize = morselEntrySize;
   // allocate memorygetTableName
   // startPtr = (void *)new char[morselSize];
-  startPtr = (void *)malloc(morselSize*sizeof(char));
+  startPtr = (void *)malloc(morselSize * sizeof(char));
   nextFreeIndex = 0;
   filledEntries = 0;
 }
@@ -35,33 +35,30 @@ int Morsel::setNext(Morsel *nextPtr) {
 // memory management
 void *Morsel::getStartPtr() { return startPtr; }
 
-
-
-
 void *Morsel::getNthMorselEntry(int n) {
   int entryWithMetadataSize = entrySize;
-  return (void *)((char *)startPtr +( n * entryWithMetadataSize));
+  return (void *)((char *)startPtr + (n * entryWithMetadataSize));
 }
 
 int Morsel::setNthMorselEntry(int n, void *ptr) {
   void *nthMorsel = getNthMorselEntry(n);
-  memcpy(nthMorsel, ptr , entrySize);
-  //copy 
-  // std::copy((char *)ptr, (char *)nthMorsel, entrySize);
+  memcpy(nthMorsel, ptr, entrySize);
+  // copy
+  //  std::copy((char *)ptr, (char *)nthMorsel, entrySize);
   return 0;
 }
 
-int Morsel::setNthMorselEntry(int n, void *ptr, std::list<Attribute> attributeList) {
+int Morsel::setNthMorselEntry(int n, void *ptr,
+                              std::list<Attribute> attributeList) {
   void *nthMorsel = getNthMorselEntry(n);
   int offset = 0;
-  for (auto iter = attributeList.begin() ; iter != attributeList.end() ; iter++) {
+  for (auto iter = attributeList.begin(); iter != attributeList.end(); iter++) {
     Attribute attr = *iter;
-    memcpy((char *)nthMorsel + offset , (char *)ptr + attr.offset, attr.size);
+    memcpy((char *)nthMorsel + offset, (char *)ptr + attr.offset, attr.size);
     offset += attr.size;
   }
   return 0;
 }
-
 
 int Morsel::getTotalSize() { return size; }
 int Morsel::getEntrySize() { return entrySize; }
@@ -84,23 +81,20 @@ int Morsel::insertEntry(void *entry) {
   return 0;
 }
 
-
-int Morsel::insertEntry(void *entry , std::list<Attribute> attributeList){
+int Morsel::insertEntry(void *entry, std::list<Attribute> attributeList) {
   if (this->filledEntries >= getTotalNumberOfEntries()) {
     if (next == NULL) {
       // create new morsel
       next = new Morsel(size, entrySize);
     }
-    return next->insertEntry(entry , attributeList);
+    return next->insertEntry(entry, attributeList);
   }
-  
-  setNthMorselEntry(this->nextFreeIndex, entry , attributeList);
+
+  setNthMorselEntry(this->nextFreeIndex, entry, attributeList);
   this->nextFreeIndex++;
   // increment filled entries
   this->filledEntries++;
   return 0;
 }
 
-int Morsel::getFilledNumberOfEntries(){
-  return filledEntries;
-}
+int Morsel::getFilledNumberOfEntries() { return filledEntries; }

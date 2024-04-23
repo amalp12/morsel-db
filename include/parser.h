@@ -2,4 +2,4 @@
 #include <hsql/SQLParser.h>
 #include <hsql/util/sqlhelper.h>
 
-void parseSelectStatement(const hsql::SQLStatement* statement);
+void parseSelectStatement(const hsql::SQLStatement *statement);

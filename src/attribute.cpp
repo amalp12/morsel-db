@@ -1,5 +1,5 @@
-#include "constants.h"
 #include "attribute.h"
+#include "constants.h"
 int getAttributeSizeFromType(int type) {
   switch (type) {
   case STRING:

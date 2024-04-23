@@ -3,20 +3,19 @@
 #include <hsql/SQLParser.h>
 #include <hsql/util/sqlhelper.h>
 #include <iostream>
-#include "dispatcher.h"
-#include "test.h"
 
-void parseSelectStatement(const hsql::SQLStatement* statement) {
-    if (statement->type() == hsql::kStmtSelect) {
-        const auto* selectStatement = static_cast<const hsql::SelectStatement*>(statement);
-        // Parse columns
-        std::cout << "Columns: ";
-        for (const auto* column : *selectStatement->selectList) {
-            if (column->type == hsql::kExprColumnRef) {
-                std::cout << column->name << " ";
-            }
-        }
-        std::cout << std::endl;
+void parseSelectStatement(const hsql::SQLStatement *statement) {
+  if (statement->type() == hsql::kStmtSelect) {
+    const auto *selectStatement =
+        static_cast<const hsql::SelectStatement *>(statement);
+    // Parse columns
+    std::cout << "Columns: ";
+    for (const auto *column : *selectStatement->selectList) {
+      if (column->type == hsql::kExprColumnRef) {
+        std::cout << column->name << " ";
+      }
+    }
+    std::cout << std::endl;
 
     if (selectStatement->fromTable != nullptr) {
       std::cout << "Table: " << selectStatement->fromTable->name << std::endl;
@@ -35,7 +34,7 @@ int main(int argc, char **argv) {
   create_table_test();
   while (true) {
     try {
-      std::cout << "Enter your query: " <<std::endl;
+      std::cout << "Enter your query: " << std::endl;
       // SELECT ID, Name, Age FROM test_table WHERE Age > 0;
       std::string query;
       std::getline(std::cin, query);

@@ -2,7 +2,8 @@
 
 // void parseSelectStatement(const hsql::SQLStatement* statement) {
 //     if (statement->type() == hsql::kStmtSelect) {
-//         const auto* selectStatement = static_cast<const hsql::SelectStatement*>(statement);
+//         const auto* selectStatement = static_cast<const
+//         hsql::SelectStatement*>(statement);
 
 //         // Parse columns
 //         std::cout << "Columns: ";
@@ -14,11 +15,13 @@
 //         std::cout << std::endl;
 
 //         if (selectStatement->fromTable != nullptr) {
-//             std::cout << "Table: " << selectStatement->fromTable->name << std::endl;
+//             std::cout << "Table: " << selectStatement->fromTable->name <<
+//             std::endl;
 //         }
 
 //         if (selectStatement->whereClause != nullptr) {
-//             std::cout << "WHERE: \n"; ;hsql::printExpression(selectStatement->whereClause, 1);
+//             std::cout << "WHERE: \n";
+//             ;hsql::printExpression(selectStatement->whereClause, 1);
 //         }
 //     }
 // }

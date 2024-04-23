@@ -1,18 +1,17 @@
 #pragma once
-#include <threads.h>
 #include <cstring>
 #include <list>
 #include <string>
-
+#include <threads.h>
 
 struct Row {
-    int id;
-    char name[STRING_SIZE];
-    int age;
+  int id;
+  char name[STRING_SIZE];
+  int age;
 };
 
-
-void initMorsel(int core , std::string tableName , int start_index , int end_index);
+void initMorsel(int core, std::string tableName, int start_index,
+                int end_index);
 
 int create_table_test();
 
@@ -22,12 +21,13 @@ void destructRelcat();
 
 void loadPrevTable();
 
-void insertRowsRandom(std::list<int> colTypeList , std::string tableName);
+void insertRowsRandom(std::list<int> colTypeList, std::string tableName);
 
-void initMorselRandom(int core , std::string tableName , int start_index , int end_index);
+void initMorselRandom(int core, std::string tableName, int start_index,
+                      int end_index);
 
 int create_table_test_random();
 
-std::string get_env_var( std::string const & key );                                 
+std::string get_env_var(std::string const &key);
 
 int create_table_test_random(std::string tableName);
