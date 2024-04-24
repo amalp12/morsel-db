@@ -113,10 +113,10 @@ bool fn_join_loop(LoopFnArgs args)
 
             bool matched = Operator::match(build_input_tuple_val, probe_input_tuple_val, args.joinArgs.op, args.joinArgs.probeTableAttr->type, args.joinArgs.entrySize);
             WriteTupleStream *output_ts = args.joinArgs.output_ts;
-            void *output_tuple = (void *)malloc(sizeof(char) * output_ts->getEntrySize());
+            
             if (matched)
             {
-                
+                void *output_tuple = (void *)malloc(sizeof(char) * output_ts->getEntrySize());
                 for (const auto &attr1 : output_ts->getAttributeList())
                 {
                     bool hit  = false;
@@ -145,9 +145,10 @@ bool fn_join_loop(LoopFnArgs args)
                 }
 
                 output_ts->insert(output_tuple);
+                free(output_tuple);
             }
 
-            free(output_tuple);
+            
         }
 
         delete build_table_input_ts;
