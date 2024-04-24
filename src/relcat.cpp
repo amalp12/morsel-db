@@ -40,6 +40,7 @@ int RelationCatalogEntry::setAttributes(
     attr.name = *iter_colNameList;
     attr.type = *iter_colTypeList;
     attr.size = getAttributeSizeFromType(*iter_colTypeList);
+    attr.bPlusTreeContainer = nullptr;
     if (iter_colNameList == colNameList.begin()) {
       attr.offset = 0;
     } else {

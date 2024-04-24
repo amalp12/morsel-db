@@ -1,5 +1,6 @@
-#ifndef DISPATCHER_H
-#define DISPATCHER_H
+// #ifndef DISPATCHER_H
+// #define DISPATCHER_H
+#pragma once
 #include "morsel.h"
 #include <hsql/SQLParser.h>
 #include <hsql/util/sqlhelper.h>
@@ -56,4 +57,4 @@ public:
 
 // extern Dispatcher DISPATCHER;
 // extern QEP  QEPObject;
-#endif
+// #endif

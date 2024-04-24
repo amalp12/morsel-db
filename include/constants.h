@@ -1,15 +1,25 @@
 // define constants using enum
 
-#ifndef CONSTANTS_H
-#define CONSTANTS_H
+// #ifndef CONSTANTS_H
+// #define CONSTANTS_H
+#pragma once
 
 // b plus tree max key size
 enum B_PLUS_TREE {
   MAX_B_PLUS_TREE_KEYS = 3, // Maximum number of keys in a node
-  MAX_LEAF_NODE_SIZE = 3,
-  MAX_INTERNAL_NODE_SIZE = 4
+  MAX_KEYS_LEAF = 63,
+  MAX_KEYS_INTERNAL = 100,
+  MIDDLE_INDEX_INTERNAL = MAX_KEYS_INTERNAL / 2,
+  MIDDLE_INDEX_LEAF = MAX_KEYS_LEAF / 2,
 };
 
+// error codes
+enum B_PLUS_TREE_ERROR {
+  MEMORY_FULL = -2,
+  DUPLICATE_KEY = -3,
+  KEY_NOT_FOUND = -4,
+  INVALID_KEY = -5
+};
 enum B_PLUS_TREE_NODE_TYPE { LEAF_NODE, INTERNAL_NODE };
 
 // constants for types
@@ -43,4 +53,4 @@ enum SELECT_LOOP_ARG_INDEX {
   SELECT_LOOP_ARG_OUTPUT_TUPLE_STREAM
 };
 
-#endif
+// #endif

@@ -1,106 +1,116 @@
+#pragma once
 #include "attribute.h"
 #include "constants.h"
+#include "morsel.h"
 #include "relcat.h"
-#include <iostream>
-#include <vector>
+#include "tuple.h"
 
 class BPlusTree_Node {
 private:
-  bool node_type; // 0 for leaf, 1 for internal
+  int node_type; // 0 for leaf, 1 for internal
+  int number_of_filled_units;
+  BPlusTree_Node *parent;
 
 public:
   // define constructor
-  BPlusTree_Node(bool type) { node_type = type; }
+  BPlusTree_Node(int type);
+  BPlusTree_Node(int type, BPlusTree_Node *parent);
   // define node type getter
-  bool get_node_type() { return node_type; }
+  int getNodeType();
+  int getNumberOfFilledUnits();
+  void setNumberOfFilledUnits(int num);
+  void incrementNumberOfFilledUnits();
+  void decrementNumberOfFilledUnits();
+  BPlusTree_Node *getParent();
+  void setParent(BPlusTree_Node *parent);
+};
+
+template <typename T> class BPlusTree_NodeUnit {
+public:
+  T key;
+  BPlusTree_NodeUnit *left_child;
+  BPlusTree_NodeUnit *right_child;
 };
 
 // Leaf Unit of type TK for key and  TV for value
-template <typename T> class BPlusTree_LeafUnit {
+template <typename T> class BPlusTree_LeafUnit : public BPlusTree_NodeUnit<T> {
 public:
-  T key;
   void *reference;
-  BPlusTree_LeafUnit *next;
+  // constructor
+  // constructor, define key, reference, left and right child with default
+  // values
+  BPlusTree_LeafUnit(T key, void *reference, BPlusTree_LeafUnit *left = NULL,
+                     BPlusTree_LeafUnit *right = NULL);
 };
 
 // Internal Unit
-template <typename T> class BPlusTree_InternalUnit {
+template <typename T>
+class BPlusTree_InternalUnit : public BPlusTree_NodeUnit<T> {
 public:
-  T key;
-  BPlusTree_Node *right_child;
+  // constructor, define key, left and right child with default values
+  BPlusTree_InternalUnit(T key, BPlusTree_InternalUnit *left = NULL,
+                         BPlusTree_InternalUnit *right = NULL);
 };
 
 // Leaf Node
 template <typename T> class BPlusTree_LeafNode : public BPlusTree_Node {
 public:
-  BPlusTree_LeafUnit<T> units[MAX_LEAF_NODE_SIZE];
+  BPlusTree_LeafNode<T>();
+  BPlusTree_LeafUnit<T> units[MAX_KEYS_LEAF];
 };
 
 // Internal Node
 template <typename T> class BPlusTree_InternalNode : public BPlusTree_Node {
 public:
-  BPlusTree_InternalUnit<T> units[MAX_INTERNAL_NODE_SIZE];
+  BPlusTree_InternalNode<T>();
+  BPlusTree_InternalUnit<T> units[MAX_KEYS_INTERNAL];
 };
 
 template <typename T> class BPlusTree {
 private:
   BPlusTree_Node *root;
-  Attribute attribute;
+  Attribute *attribute;
   RelationCatalogEntry relcat_entry;
+  int coreNumber;
 
   // find leaf to insert
   BPlusTree_LeafNode<T> *findLeafNodeToInsert(T attrVal);
 
   // insert into leaf
-  int insertIntoLeaf(T attrVal, BPlusTree_LeafNode<T> *leafNode);
+  int insertIntoLeaf(T attrVal, void *reference,
+                     BPlusTree_LeafNode<T> *leafNode);
 
   // split leaf
-  BPlusTree_LeafNode<T> *splitLeaf(BPlusTree_LeafNode<T> *leafNode);
+  BPlusTree_LeafNode<T> *splitLeaf(BPlusTree_LeafNode<T> *leafNode,
+                                   BPlusTree_LeafUnit<T> *indices);
 
   // insert into internal
-  int insertIntoInternal(T attrVal, BPlusTree_InternalNode<T> *internalNode);
+  int insertIntoInternal(T attrVal, BPlusTree_InternalNode<T> *internalNode,
+                         BPlusTree_Node *lChild, BPlusTree_Node *rChild);
 
   // split internal
   BPlusTree_InternalNode<T> *
-  splitInternal(BPlusTree_InternalNode<T> *internalNode);
+  splitInternal(BPlusTree_InternalNode<T> *internalNode,
+                BPlusTree_InternalUnit<T> *indices);
 
   // create new root
-  BPlusTree_Node *createNewRoot(Attribute *attr, BPlusTree_Node *lChild,
-                                BPlusTree_Node *rChild);
+  void createNewRoot(BPlusTree_Node *lChild, BPlusTree_Node *rChild);
 
   // create/build tree
   int buildTree();
 
 public:
   // constructor
-  BPlusTree(Attribute attr, RelationCatalogEntry entry) {
-    root = new BPlusTree_LeafNode<T>(LEAF_NODE);
-    // build
-    attribute = attr;
-    relcat_entry = entry;
-  }
+  BPlusTree(Attribute *attr, RelationCatalogEntry entry, int core);
 
   // insert
+  int insert(T attrVal, void *reference);
 
   // search
+  void *search(T attrVal);
+
+  int destroy();
 
   // destructor
   ~BPlusTree();
 };
-
-// private:
-//   static int findLeafToInsert(int rootBlock, Attribute attrVal, int
-//   attrType); static int insertIntoLeaf(int relId, char attrName[ATTR_SIZE],
-//   int blockNum, Index entry); static int splitLeaf(int leafBlockNum, Index
-//   indices[]); static int insertIntoInternal(int relId, char
-//   attrName[ATTR_SIZE], int intBlockNum, InternalEntry entry); static int
-//   splitInternal(int intBlockNum, InternalEntry internalEntries[]); static int
-//   createNewRoot(int relId, char attrName[ATTR_SIZE], Attribute attrVal, int
-//   lChild, int rChild);
-
-//  public:
-//   static int bPlusCreate(int relId, char attrName[ATTR_SIZE]);
-//   static int bPlusInsert(int relId, char attrName[ATTR_SIZE], union Attribute
-//   attrVal, RecId recordId); static RecId bPlusSearch(int relId, char
-//   attrName[ATTR_SIZE], union Attribute attrVal, int op); static int
-//   bPlusDestroy(int rootBlockNum);

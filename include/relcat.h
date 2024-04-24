@@ -1,10 +1,10 @@
-#ifndef RELCAT_H
-#define RELCAT_H
+// #ifndef RELCAT_H
+// #define RELCAT_H
+#pragma once
 #include "attribute.h"
 #include "morsel.h"
 #include "static.h"
 #include <constants.h>
-#include <iostream>
 #include <list>
 #include <map>
 
@@ -53,4 +53,4 @@ public:
 
 // Global variable referencing the relcat object
 // extern RelationCatalog RELCAT;
-#endif
+// #endif

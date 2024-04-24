@@ -1,6 +1,7 @@
+#pragma once
 // ifndef guard
-#ifndef STATIC_H
-#define STATIC_H
+// #ifndef STATIC_H
+// #define STATIC_H
 // declare static integers for number of cores and max morsel size
 
 // write a static class to set the number of cores and max morsel size
@@ -16,4 +17,4 @@ public:
   static int getNumberOfCores() { return numCores; }
   static int getMaxMorselSize() { return maxMorselSize; }
 };
-#endif
+// #endif

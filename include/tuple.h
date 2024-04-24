@@ -4,6 +4,7 @@
 #include "morsel.h"
 #include "relcat.h"
 #include <fstream>
+#include <iostream>
 #include <list>
 #include <string>
 
