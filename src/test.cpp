@@ -114,9 +114,9 @@ int create_table_test() {
 }
 
 int create_table_test_random(std::string tableName) {
-  // SELECT Table_A.Column_2_Table_A , Table_B.Column_2_Table_B FROM Table_A
-  // INNER JOIN Table_B ON Table_A.Column_2_Table_A = Table_B.Column_2_Table_B;
-  // staticvars
+  // SELECT Table_A.Column_1_Table_A , Table_B.Column_1_Table_B ,
+  // Table_A.Column_2_Table_A , Table_B.Column_2_Table_B FROM Table_A INNER JOIN
+  // Table_B ON Table_A.Column_2_Table_A = Table_B.Column_2_Table_B; staticvars
   StaticVars staticVars;
   std::list<std::string> colNameList;
   std::list<int> colTypeList;
@@ -198,7 +198,7 @@ void initMorselRandom(int core, std::string tableName, int start_index,
   int integerAttr;
   char stringAttr[STRING_SIZE] = {'\0'};
 
-  std::string filename = get_env_var("ROOTDIR") + "/in/test_table.csv";
+  std::string filename = get_env_var("ROOTDIR") + "/in/" + tableName + ".csv";
   std::ifstream file(filename);
 
   if (!file.is_open()) {
@@ -245,27 +245,42 @@ void initMorselRandom(int core, std::string tableName, int start_index,
 
 void insertRowsRandom(std::list<int> colTypeList, std::string tableName) {
 
-  std::string filename = get_env_var("ROOTDIR") + "/in/test_table.csv";
+  std::string filename = get_env_var("ROOTDIR") + "/in/" + tableName + ".csv";
   std::ofstream outFile(filename, std::ios_base::out);
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<int> distribution(10000, 100000);
+  //    std::uniform_int_distribution<int> distribution(10000, 100000);
+  int num_rows;
+  if (tableName == "Table_A") {
+    std::uniform_int_distribution<int> distribution(100000, 400000);
+    num_rows = distribution(gen);
+  }
 
-  int num_rows = distribution(gen);
+  else if (tableName == "Table_B") {
+    std::uniform_int_distribution<int> distribution(5000, 10000);
+    num_rows = distribution(gen);
+  }
+
+  //    int num_rows = distribution(gen);
 
   for (int i = 0; i < num_rows; i++) {
     int col = 0;
     for (const auto &column : colTypeList) {
       if (column == INTEGER) {
-        if (col != colTypeList.size() - 1)
-          outFile << i + 1 << ";";
+        std::uniform_int_distribution<int> distribution_col(1, 50);
+        int num = distribution_col(gen);
+        if (col != 0)
+          outFile << ";" << num;
         else
           outFile << i + 1;
       }
 
       else if (column == STRING) {
-        if (col != colTypeList.size() - 1)
-          outFile << "str" + std::to_string(i + 1) << ";";
+        std::uniform_int_distribution<int> distribution_col(1, 50);
+        int num = distribution_col(gen);
+        if (col != 0)
+          outFile << ";"
+                  << "str" + std::to_string(num);
         else
           outFile << "str" + std::to_string(i + 1);
       }
