@@ -1,4 +1,8 @@
+#include "b_plus_tree.h"
+#include "constants.h"
 #include "loop_functions.h"
+#include "static.h"
+#include <string>
 
 bool fn_select_loop(LoopFnArgs args) {
 
@@ -133,6 +137,90 @@ bool fn_join_loop(LoopFnArgs args) {
 
   else {
     // Write code for bplus tree search
+    // get the bplus tree container
+    BPlusTreeContainer *bPlusTreeContainer =
+        args.joinArgs.probeTableAttr->bPlusTreeContainer;
+
+    RelationCatalogEntry *buildTableEntry = new RelationCatalogEntry();
+
+    RelationCatalog RELCAT;
+    int ret =
+        RELCAT.getTableEntry(*(args.joinArgs.buildTableName), buildTableEntry);
+
+    // create bplus tree
+
+    if (!bPlusTreeContainer->isIndexedForCoreNumber(args.joinArgs.coreNum)) {
+      if (args.joinArgs.probeTableAttr->type == INTEGER) {
+        BPlusTree<int> *bPlusTree =
+            new BPlusTree<int>(args.joinArgs.buildTableAttr, buildTableEntry,
+                               args.joinArgs.coreNum);
+        bPlusTreeContainer->setTreeRef((void *)bPlusTree,
+                                       args.joinArgs.coreNum);
+      }
+
+      else if (args.joinArgs.probeTableAttr->type == STRING) {
+        BPlusTree<std::string> *bPlusTree =
+            new BPlusTree<std::string>(args.joinArgs.buildTableAttr,
+                                       buildTableEntry, args.joinArgs.coreNum);
+        bPlusTreeContainer->setTreeRef((void *)bPlusTree,
+                                       args.joinArgs.coreNum);
+      }
+    }
+
+    void *bPlusTree = bPlusTreeContainer->getTreeRef(args.joinArgs.coreNum);
+
+    void *hit_tuple = nullptr;
+    switch (args.joinArgs.probeTableAttr->type) {
+
+    case INTEGER: {
+      BPlusTree<int> *bPlusTreeInt = (BPlusTree<int> *)bPlusTree;
+      // search the bplus tree
+      hit_tuple =
+          bPlusTreeInt->search(*((int *)probe_input_tuple), args.joinArgs.op);
+    }
+
+    case STRING: {
+      BPlusTree<std::string> *bPlusTreeString =
+          (BPlusTree<std::string> *)bPlusTree;
+      hit_tuple = bPlusTreeString->search(*((std::string *)probe_input_tuple),
+                                          args.joinArgs.op);
+      break;
+    }
+    default: {
+      break;
+    }
+    }
+
+    // if hit tuple is not null then insert the tuple into the output tuple
+    // stream
+    if (hit_tuple != nullptr) {
+      void *output_tuple = (void *)malloc(
+          sizeof(char) * args.joinArgs.output_ts->getEntrySize());
+      for (const auto &attr1 : args.joinArgs.output_ts->getAttributeList()) {
+        bool hit = false;
+        // if the attribute is the selected attribute then copy the value
+
+        // the output tuple
+        for (const auto &attr2 : probe_table_ts->getAttributeList()) {
+          if (attr1.name == attr2.name) {
+            hit = true;
+            memcpy((char *)output_tuple + attr1.offset,
+                   (char *)probe_input_tuple + attr2.offset, attr1.size);
+          }
+        }
+
+        if (hit == false) {
+          for (const auto &attr2 : buildTableEntry->getAttributes()) {
+            if (attr1.name == attr2.name) {
+              hit = true;
+              memcpy((char *)output_tuple + attr1.offset,
+                     (char *)hit_tuple + attr2.offset, attr1.size);
+            }
+          }
+        }
+      }
+      args.joinArgs.output_ts->insert(output_tuple);
+    }
   }
   return true;
 }

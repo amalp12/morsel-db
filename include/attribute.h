@@ -1,6 +1,4 @@
 #pragma once
-#include "constants.h"
-#include "static.h"
 #include <string>
 
 class BPlusTreeContainer {
@@ -10,7 +8,8 @@ private:
 
 public:
   BPlusTreeContainer(std::string tableName);
-  int insertTreeRef(void *treeRef);
+  int setTreeRef(void *treeRef, int coreNumber);
+  void *getTreeRef(int coreNumber);
   bool isIndexedForCoreNumber(int coreNumber);
 };
 

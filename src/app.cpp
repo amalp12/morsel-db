@@ -1,10 +1,53 @@
 #include "dispatcher.h"
 #include "lib.h"
+#include "relcat.h"
+#include "static.h"
 #include "test.h"
 #include <hsql/SQLParser.h>
+#include <hsql/sql/SQLStatement.h>
+#include <hsql/sql/Table.h>
 #include <hsql/util/sqlhelper.h>
 #include <iostream>
+#include <string>
 #include <thread>
+
+void initializeJoinHash(const hsql::SelectStatement *selectStatement,
+                        std::string table1, std::string table2) {
+  // get relcat
+  RelationCatalog relcat;
+
+  // get table1
+  RelationCatalogEntry probeTable, buildTable;
+  // probe table is the smaller table and build table is the larger table
+
+  relcat.getTableEntry(table1, &probeTable);
+  relcat.getTableEntry(table2, &buildTable);
+
+  if (probeTable.num_records > buildTable.num_records) {
+    std::swap(probeTable, buildTable);
+  }
+
+  // get the name of the attributes in the build table that is supposed to be
+  // indexed usig b+ tree
+
+  // std::vector<std::string> buildTableIndexAttributes;
+  // get the list of column names of the build table that is used in the join
+  // statement
+  std::string joinStatementAttribute =
+      selectStatement->fromTable->join->condition->expr->name;
+
+  for (auto &attr : buildTable.getAttributes()) {
+    // get attributes in the join statement
+
+    if (joinStatementAttribute == attr.name) {
+      // buildTableIndexAttributes.push_back(attr.name);
+      // create index on the attribute
+      attr.isIndexed = true;
+      // create index on the attribute
+      attr.bPlusTreeContainer = new BPlusTreeContainer(attr.name);
+    }
+  }
+}
 
 int main(int argc, char **argv) {
 
@@ -49,6 +92,17 @@ int main(int argc, char **argv) {
 
         QEP qep(statement);
 
+        if (statement->type() == hsql::kStmtSelect) {
+
+          // typecast to select statement
+          const hsql::SelectStatement *selectStatement =
+              (const hsql::SelectStatement *)statement;
+          // check if join
+          if (selectStatement->fromTable->type == hsql::kTableJoin) {
+            // initialize join hash
+            initializeJoinHash(selectStatement, table1, table2);
+          }
+        }
         // call execute on the qep object
         // qep.execute(0);
         // number of cores

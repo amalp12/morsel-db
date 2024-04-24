@@ -1,5 +1,6 @@
 #include "dispatcher.h"
 #include "lib.h"
+#include "static.h"
 #include "test.h"
 #include <hsql/SQLParser.h>
 #include <hsql/util/sqlhelper.h>

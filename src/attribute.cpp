@@ -1,5 +1,7 @@
 #include "attribute.h"
+#include "constants.h"
 #include "relcat.h"
+#include "static.h"
 
 int getAttributeSizeFromType(int type) {
   switch (type) {
@@ -41,8 +43,16 @@ BPlusTreeContainer::BPlusTreeContainer(std::string tableName) {
   relCat.getTableEntry(tableName, &relcat_entry);
 }
 
-int BPlusTreeContainer::insertTreeRef(void *treeRef) {
-  // bPlusTreeRef.push_back(treeRef);
+int BPlusTreeContainer::setTreeRef(void *treeRef, int coreNumber) {
+  if (coreNumber < 0 || coreNumber >= this->size || treeRef == NULL ||
+      this->bPlusTreeRef[coreNumber] != NULL) {
+    return FAILURE;
+  }
+  this->bPlusTreeRef[coreNumber] = treeRef;
 
   return SUCCESS;
+}
+
+void *BPlusTreeContainer::getTreeRef(int coreNumber) {
+  return this->bPlusTreeRef[coreNumber];
 }

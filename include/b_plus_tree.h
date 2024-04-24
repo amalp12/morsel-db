@@ -1,18 +1,16 @@
 #pragma once
 #include "attribute.h"
 #include "constants.h"
-#include "morsel.h"
 #include "relcat.h"
-#include "tuple.h"
 
 class BPlusTree_Node {
 private:
   int node_type; // 0 for leaf, 1 for internal
   int number_of_filled_units;
-  BPlusTree_Node *parent;
 
 public:
   // define constructor
+  BPlusTree_Node *parent;
   BPlusTree_Node(int type);
   BPlusTree_Node(int type, BPlusTree_Node *parent);
   // define node type getter
@@ -36,11 +34,11 @@ public:
 template <typename T> class BPlusTree_LeafUnit : public BPlusTree_NodeUnit<T> {
 public:
   void *reference;
-  // constructor
   // constructor, define key, reference, left and right child with default
   // values
-  BPlusTree_LeafUnit(T key, void *reference, BPlusTree_Node *left = NULL,
-                     BPlusTree_Node *right = NULL);
+  BPlusTree_LeafUnit(T key, void *reference, BPlusTree_Node *left,
+                     BPlusTree_Node *right);
+  BPlusTree_LeafUnit();
 };
 
 // Internal Unit
@@ -50,11 +48,14 @@ public:
   // constructor, define key, left and right child with default values
   BPlusTree_InternalUnit(T key, BPlusTree_Node *left = NULL,
                          BPlusTree_Node *right = NULL);
+  BPlusTree_InternalUnit();
 };
 
 // Leaf Node
 template <typename T> class BPlusTree_LeafNode : public BPlusTree_Node {
 public:
+  BPlusTree_LeafNode<T> *next;
+  BPlusTree_LeafNode<T> *prev;
   BPlusTree_LeafNode<T>();
   BPlusTree_LeafUnit<T> units[MAX_KEYS_LEAF];
 };
@@ -70,7 +71,7 @@ template <typename T> class BPlusTree {
 private:
   BPlusTree_Node *root;
   Attribute *attribute;
-  RelationCatalogEntry relcat_entry;
+  RelationCatalogEntry *relcat_entry;
   int coreNumber;
 
   // find leaf to insert
@@ -82,7 +83,7 @@ private:
 
   // split leaf
   BPlusTree_LeafNode<T> *splitLeaf(BPlusTree_LeafNode<T> *leafNode,
-                                   BPlusTree_LeafUnit<T> *indices);
+                                   BPlusTree_LeafUnit<T> **indices);
 
   // insert into internal
   int insertIntoInternal(T attrVal, BPlusTree_InternalNode<T> *internalNode,
@@ -91,7 +92,7 @@ private:
   // split internal
   BPlusTree_InternalNode<T> *
   splitInternal(BPlusTree_InternalNode<T> *internalNode,
-                BPlusTree_InternalUnit<T> *indices);
+                BPlusTree_InternalUnit<T> **indices);
 
   // create new root
   void createNewRoot(BPlusTree_Node *lChild, BPlusTree_Node *rChild);
@@ -101,7 +102,7 @@ private:
 
 public:
   // constructor
-  BPlusTree(Attribute *attr, RelationCatalogEntry entry, int core);
+  BPlusTree(Attribute *attr, RelationCatalogEntry *entry, int core);
 
   // insert
   int insert(T attrVal, void *reference);
@@ -114,3 +115,7 @@ public:
   // destructor
   ~BPlusTree();
 };
+
+// template class BPlusTree<double>;
+template class BPlusTree<int>;
+template class BPlusTree<std::string>;

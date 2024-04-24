@@ -20,6 +20,7 @@ struct JoinFn {
   std::string *buildTableName;
   int op;
   int entrySize;
+  int coreNum;
 };
 
 union LoopFnArgs {

@@ -1,3 +1,4 @@
+#include "static.h"
 #include "test.h"
 #include <algorithm>
 #include <cstdlib>
@@ -153,6 +154,10 @@ int create_table_test_random(std::string tableName) {
   int num_records = insertRowsRandom(colTypeList, tableName);
 
   relCat.insertNewTable(tableName, colNameList, colTypeList);
+
+  RelationCatalogEntry *entry = new RelationCatalogEntry();
+  relCat.getTableEntry(tableName, entry);
+  entry->num_records = num_records;
 
   // initMorsel(0 , tableName);
   // Create threads

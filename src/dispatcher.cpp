@@ -341,6 +341,7 @@ int QEP::handleJoin(int coreNum, const hsql::SelectStatement *selectStatement) {
     break;
   }
 
+  args.joinArgs.coreNum = coreNum;
   Operator::loop(fn_join_loop, args, JOIN_FN_IDENTIFIER);
 
   std::string output_file_name = "/home/ssl/Code/db/out/temp_join_result_" +

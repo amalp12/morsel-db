@@ -1,7 +1,7 @@
-#include "lib.h"
 #include "constants.h"
+#include "lib.h"
+#include <cstring>
 #include <iostream>
-
 bool compareInt(int value1, int value2, int operatorType) {
   switch (operatorType) {
   case EQUAL:
@@ -142,4 +142,9 @@ void parseSelectStatement(const hsql::SQLStatement *statement) {
     // }
     // std::cout << std::endl;
   }
+}
+
+int compareAttrs(int val1, int val2, int operatorType) { return val1 - val2; }
+int compareAttrs(std::string val1, std::string val2, int operatorType) {
+  return val1.compare(val2);
 }

@@ -3,7 +3,6 @@
 #pragma once
 #include "attribute.h"
 #include "morsel.h"
-#include "static.h"
 #include <constants.h>
 #include <list>
 #include <map>
