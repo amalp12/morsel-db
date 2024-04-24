@@ -5,12 +5,13 @@
 
 class BPlusTreeContainer {
 private:
-  void **bPlusTreeRef;
+  void **bPlusTreeRef = nullptr;
   int size;
 
 public:
   BPlusTreeContainer(std::string tableName);
   int insertTreeRef(void *treeRef);
+  bool isIndexedForCoreNumber(int coreNumber);
 };
 
 // TODO : initialize size of vector/list holding bplus tree refs of different
@@ -22,7 +23,7 @@ struct Attribute {
   int size;
   int attributeIndex;
   bool isIndexed = false;
-  BPlusTreeContainer *bPlusTreeContainer;
+  BPlusTreeContainer *bPlusTreeContainer = nullptr;
 };
 
 int getAttributeSizeFromType(int type);

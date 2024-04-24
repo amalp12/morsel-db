@@ -29,3 +29,5 @@ union LoopFnArgs {
 
 bool fn_select_loop(union LoopFnArgs args);
 bool fn_join_loop(LoopFnArgs args);
+void *linearSearch(LoopFnArgs args, void *probe_input_tuple,
+                   ReadTupleStream *build_table_input_ts);

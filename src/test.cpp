@@ -150,14 +150,14 @@ int create_table_test_random(std::string tableName) {
     outFile << *colType << "\n";
   }
 
-  insertRowsRandom(colTypeList, tableName);
+  int num_records = insertRowsRandom(colTypeList, tableName);
 
   relCat.insertNewTable(tableName, colNameList, colTypeList);
 
   // initMorsel(0 , tableName);
   // Create threads
   std::vector<std::thread> threads;
-  std::string filename = get_env_var("ROOTDIR") + "/in/test_table.csv";
+  std::string filename = get_env_var("ROOTDIR") + "/in/" + tableName + ".csv";
   std::ifstream file(filename);
   auto endBuff = std::istreambuf_iterator<char>();
   auto fileBuff = std::istreambuf_iterator<char>(file);
@@ -243,7 +243,7 @@ void initMorselRandom(int core, std::string tableName, int start_index,
   delete entry;
 }
 
-void insertRowsRandom(std::list<int> colTypeList, std::string tableName) {
+int insertRowsRandom(std::list<int> colTypeList, std::string tableName) {
 
   std::string filename = get_env_var("ROOTDIR") + "/in/" + tableName + ".csv";
   std::ofstream outFile(filename, std::ios_base::out);
@@ -251,15 +251,9 @@ void insertRowsRandom(std::list<int> colTypeList, std::string tableName) {
   std::mt19937 gen(rd());
   //    std::uniform_int_distribution<int> distribution(10000, 100000);
   int num_rows;
-  if (tableName == "Table_A") {
-    std::uniform_int_distribution<int> distribution(100000, 400000);
-    num_rows = distribution(gen);
-  }
 
-  else if (tableName == "Table_B") {
-    std::uniform_int_distribution<int> distribution(5000, 10000);
-    num_rows = distribution(gen);
-  }
+  std::uniform_int_distribution<int> distribution(100000, 400000);
+  num_rows = distribution(gen);
 
   //    int num_rows = distribution(gen);
 
@@ -290,6 +284,8 @@ void insertRowsRandom(std::list<int> colTypeList, std::string tableName) {
 
     outFile << "\n";
   }
+
+  return num_rows;
 }
 
 void createTableMetaAndRows(std::string tableName) {

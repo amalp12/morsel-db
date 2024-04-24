@@ -12,8 +12,10 @@ class RelationCatalogEntry {
 private:
   std::string tableName;
   std::list<Attribute> attributeList;
+  // TODO: sixe of table
 
 public:
+  int num_records;
   std::map<int, Morsel *> threadMap;
   RelationCatalogEntry();
   std::string getTableName();

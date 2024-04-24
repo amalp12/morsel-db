@@ -1,5 +1,6 @@
 #include "b_plus_tree.h"
 #include "constants.h"
+#include <cstddef>
 
 // constructor
 template <typename T>
@@ -53,8 +54,8 @@ BPlusTree_InternalNode<T>::BPlusTree_InternalNode()
 
 int BPlusTree_Node::getNumberOfFilledUnits() { return number_of_filled_units; }
 template <typename T>
-BPlusTree_InternalUnit<T>::BPlusTree_InternalUnit(
-    T key, BPlusTree_InternalUnit *left, BPlusTree_InternalUnit *right) {
+BPlusTree_InternalUnit<T>::BPlusTree_InternalUnit(T key, BPlusTree_Node *left,
+                                                  BPlusTree_Node *right) {
   this->key = key;
   this->left_child = left;
   this->right_child = right;
@@ -62,8 +63,8 @@ BPlusTree_InternalUnit<T>::BPlusTree_InternalUnit(
 
 template <typename T>
 BPlusTree_LeafUnit<T>::BPlusTree_LeafUnit(T key, void *reference,
-                                          BPlusTree_LeafUnit *left,
-                                          BPlusTree_LeafUnit *right) {
+                                          BPlusTree_Node *left,
+                                          BPlusTree_Node *right) {
   this->key = key;
   this->reference = reference;
   this->left_child = left;
@@ -191,6 +192,118 @@ int BPlusTree<T>::insertIntoLeaf(
 }
 
 template <typename T> int BPlusTree<T>::destroy() { return SUCCESS; }
+
+template <typename T> void *BPlusTree<T>::search(T attrVal, int op) {
+
+  // declare Node pointer
+  BPlusTree_Node *nodePtr = this->root;
+  BPlusTree_InternalUnit<T> *internalUnit;
+
+  // while the node is not a leaf node
+  while (nodePtr->getNodeType() == INTERNAL_NODE) {
+    // typecast the node to internal node
+    BPlusTree_InternalNode<T> *internalNode =
+        (BPlusTree_InternalNode<T> *)nodePtr;
+
+    // op is one of NE, LT, LE
+    if (op == NOT_EQUAL || op == LESS_THAN || op == LESS_THAN_OR_EQUAL) {
+      // - NE: need to search the entire linked list of leaf indices of the B+
+      // Tree, starting from the leftmost leaf index. Thus, always move to the
+      // left.
+
+      // - LT and LE: the attribute values are arranged in ascending order in
+      // the leaf indices of the B+ Tree. Values that satisfy these conditions,
+      // if any exist, will always be found in the left-most leaf index. Thus,
+      // always move to the left.
+
+      nodePtr = internalNode->units[0].left_child;
+    } else {
+      // - EQ, GT and GE: move to the left child of the first entry that is
+      //       greater than (or equal to) attrVal
+      //       (we are trying to find the first entry that satisfies the
+      //       condition. since the values are in ascending order we move to the
+      //       left child which might contain more entries that satisfy the
+      //       condition)
+
+      // traverse through all entries of internalBlk and find an entry that
+      //        satisfies the condition.
+      //        if op == EQ or GE, then intEntry.attrVal >= attrVal
+      //        if op == GT, then intEntry.attrVal > attrVal
+      //        Hint: the helper function compareAttrs() can be used for
+      //        comparing
+
+      int index = 0, numberOfUnits = internalNode->getNumberOfFilledUnits();
+      while (index < numberOfUnits) {
+
+        // TODO : Implement Compare Attrs
+        int cmpVal; //= compareAttrs(internalNode->units[index].key, attrVal);
+        if (((op == EQUAL || op == GREATER_THAN_OR_EQUAL) && cmpVal >= 0) ||
+            (op == GREATER_THAN && cmpVal > 0)) {
+          break;
+        }
+        index++;
+      }
+
+      /* such an entry is found*/
+      if (index < numberOfUnits) {
+        // move to the left child of that entry
+        // left child of the entry
+        nodePtr = internalNode->units[index].left_child;
+
+      } else {
+        // move to the right child of the last entry of the block
+        // i.e numEntries - 1 th entry of the block
+
+        // right child of last entry
+        nodePtr = internalNode->units[numberOfUnits - 1].right_child;
+      }
+    }
+  }
+
+  // NOTE: `nodePtr` now has the block number of a leaf index Node.
+
+  /******  Identify the first leaf index entry from the current position
+              that satisfies our condition (moving right)             ******/
+
+  // typecast the node to leaf node
+  BPlusTree_LeafNode<T> *leafNode = (BPlusTree_LeafNode<T> *)nodePtr;
+
+  while (leafNode) {
+    int numberOfUnits = leafNode->getNumberOfFilledUnits();
+    for (int index = 0; index < numberOfUnits; index++) {
+
+      // TODO : Implement compareAttrs
+      int cmpVal; // compareAttrs(leafEntry.attrVal, attrVal,
+                  // attrCatEntry.attrType);
+      if ((op == EQUAL && cmpVal == 0) ||
+          (op == LESS_THAN_OR_EQUAL && cmpVal <= 0) ||
+          (op == LESS_THAN && cmpVal < 0) ||
+          (op == GREATER_THAN && cmpVal > 0) ||
+          (op == GREATER_THAN_OR_EQUAL && cmpVal >= 0) ||
+          (op == NOT_EQUAL && cmpVal != 0)) {
+
+        // return the reference
+        return leafNode->units[index]->reference;
+
+      } else if ((op == EQUAL || op == LESS_THAN_OR_EQUAL || op == LESS_THAN) &&
+                 cmpVal > 0) {
+        /*future entries will not satisfy EQ, LE, LT since the values
+            are arranged in ascending order in the leaves */
+        return nullptr;
+      }
+    }
+    /*only for NE operation do we have to check the entire linked list;
+        for all the other op it is guaranteed that the block being searched
+        will have an entry, if it exists, satisying that op. */
+    if (op != NOT_EQUAL) {
+      break;
+    }
+    // block = next block in the linked list, i.e., the rblock in leafHead.
+    leafNode = leafNode->right_child;
+  }
+
+  return nullptr;
+}
 
 template <typename T> int BPlusTree<T>::insert(T attrVal, void *reference) {
 

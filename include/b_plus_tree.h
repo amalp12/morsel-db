@@ -28,8 +28,8 @@ public:
 template <typename T> class BPlusTree_NodeUnit {
 public:
   T key;
-  BPlusTree_NodeUnit *left_child;
-  BPlusTree_NodeUnit *right_child;
+  BPlusTree_Node *left_child;
+  BPlusTree_Node *right_child;
 };
 
 // Leaf Unit of type TK for key and  TV for value
@@ -39,8 +39,8 @@ public:
   // constructor
   // constructor, define key, reference, left and right child with default
   // values
-  BPlusTree_LeafUnit(T key, void *reference, BPlusTree_LeafUnit *left = NULL,
-                     BPlusTree_LeafUnit *right = NULL);
+  BPlusTree_LeafUnit(T key, void *reference, BPlusTree_Node *left = NULL,
+                     BPlusTree_Node *right = NULL);
 };
 
 // Internal Unit
@@ -48,8 +48,8 @@ template <typename T>
 class BPlusTree_InternalUnit : public BPlusTree_NodeUnit<T> {
 public:
   // constructor, define key, left and right child with default values
-  BPlusTree_InternalUnit(T key, BPlusTree_InternalUnit *left = NULL,
-                         BPlusTree_InternalUnit *right = NULL);
+  BPlusTree_InternalUnit(T key, BPlusTree_Node *left = NULL,
+                         BPlusTree_Node *right = NULL);
 };
 
 // Leaf Node
@@ -107,7 +107,7 @@ public:
   int insert(T attrVal, void *reference);
 
   // search
-  void *search(T attrVal);
+  void *search(T attrVal, int op);
 
   int destroy();
 

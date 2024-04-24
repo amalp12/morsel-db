@@ -21,7 +21,7 @@ void destructRelcat();
 
 void loadPrevTable();
 
-void insertRowsRandom(std::list<int> colTypeList, std::string tableName);
+int insertRowsRandom(std::list<int> colTypeList, std::string tableName);
 
 void initMorselRandom(int core, std::string tableName, int start_index,
                       int end_index);

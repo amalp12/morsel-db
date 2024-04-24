@@ -14,6 +14,13 @@ int getAttributeSizeFromType(int type) {
   }
 }
 
+bool BPlusTreeContainer::isIndexedForCoreNumber(int coreNumber) {
+  if (this->bPlusTreeRef && this->bPlusTreeRef[coreNumber] != NULL) {
+    return true;
+  }
+  return false;
+}
+
 BPlusTreeContainer::BPlusTreeContainer(std::string tableName) {
   // declate relcat object
   RelationCatalog relCat;

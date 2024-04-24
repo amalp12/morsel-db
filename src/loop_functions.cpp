@@ -89,34 +89,22 @@ bool fn_join_loop(LoopFnArgs args) {
 
   StaticVars staticVar;
 
-  for (int probing_core = 1; probing_core <= staticVar.getNumberOfCores();
-       probing_core++) {
-    ReadTupleStream *build_table_input_ts =
-        new ReadTupleStream(buildTableEntry, probing_core);
+  if (!args.joinArgs.probeTableAttr->isIndexed) {
+    for (int probing_core = 1; probing_core <= staticVar.getNumberOfCores();
+         probing_core++) {
+      ReadTupleStream *build_table_input_ts =
+          new ReadTupleStream(buildTableEntry, probing_core);
 
-    while (true) {
-      void *build_input_tuple = build_table_input_ts->yieldNext();
-      if (build_input_tuple == NULL) {
-        break;
-      }
+      void *build_input_tuple =
+          linearSearch(args, probe_input_tuple, build_table_input_ts);
 
-      Tuple tup;
-      void *build_input_tuple_val =
-          tup.getTupleValue(args.joinArgs.buildTableAttr, build_input_tuple);
-      void *probe_input_tuple_val =
-          tup.getTupleValue(args.joinArgs.probeTableAttr, probe_input_tuple);
-
-      bool matched = Operator::match(
-          build_input_tuple_val, probe_input_tuple_val, args.joinArgs.op,
-          args.joinArgs.probeTableAttr->type, args.joinArgs.entrySize);
-      WriteTupleStream *output_ts = args.joinArgs.output_ts;
-      void *output_tuple =
-          (void *)malloc(sizeof(char) * output_ts->getEntrySize());
-      if (matched) {
-
-        for (const auto &attr1 : output_ts->getAttributeList()) {
+      while (build_input_tuple != nullptr) {
+        void *output_tuple = (void *)malloc(
+            sizeof(char) * args.joinArgs.output_ts->getEntrySize());
+        for (const auto &attr1 : args.joinArgs.output_ts->getAttributeList()) {
           bool hit = false;
-          // if the attribute is the selected attribute then copy the value to
+          // if the attribute is the selected attribute then copy the value
+
           // the output tuple
           for (const auto &attr2 : probe_table_ts->getAttributeList()) {
             if (attr1.name == attr2.name) {
@@ -136,16 +124,47 @@ bool fn_join_loop(LoopFnArgs args) {
             }
           }
         }
-
-        output_ts->insert(output_tuple);
+        args.joinArgs.output_ts->insert(output_tuple);
+        build_input_tuple =
+            linearSearch(args, probe_input_tuple, build_table_input_ts);
       }
-
-      free(output_tuple);
     }
-
-    delete build_table_input_ts;
   }
 
-  delete buildTableEntry;
+  else {
+    // Write code for bplus tree search
+  }
   return true;
+}
+
+void *linearSearch(LoopFnArgs args, void *probe_input_tuple,
+                   ReadTupleStream *build_table_input_ts) {
+
+  StaticVars staticVar;
+  RelationCatalog RELCAT;
+  RelationCatalogEntry *buildTableEntry = new RelationCatalogEntry();
+  int ret =
+      RELCAT.getTableEntry(*(args.joinArgs.buildTableName), buildTableEntry);
+
+  while (true) {
+    void *build_input_tuple = build_table_input_ts->yieldNext();
+    if (build_input_tuple == NULL) {
+      return nullptr;
+    }
+
+    Tuple tup;
+    void *build_input_tuple_val =
+        tup.getTupleValue(args.joinArgs.buildTableAttr, build_input_tuple);
+    void *probe_input_tuple_val =
+        tup.getTupleValue(args.joinArgs.probeTableAttr, probe_input_tuple);
+
+    bool matched = Operator::match(
+        build_input_tuple_val, probe_input_tuple_val, args.joinArgs.op,
+        args.joinArgs.probeTableAttr->type, args.joinArgs.entrySize);
+
+    if (matched) {
+      return build_input_tuple;
+    }
+  }
+  return nullptr;
 }
