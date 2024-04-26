@@ -17,14 +17,15 @@ void initializeJoinHash(const hsql::SelectStatement *selectStatement,
   RelationCatalog relcat;
 
   // get table1
-  RelationCatalogEntry probeTable, buildTable;
   // probe table is the smaller table and build table is the larger table
 
-  relcat.getTableEntry(table1, &probeTable);
-  relcat.getTableEntry(table2, &buildTable);
+  // get the table entry for table1
+  RelationCatalogEntry *probeTableEntry = relcat.getTableEntryRef(table1);
+  // get the table entry for table2
+  RelationCatalogEntry *buildTableEntry = relcat.getTableEntryRef(table2);
 
-  if (probeTable.num_records > buildTable.num_records) {
-    std::swap(probeTable, buildTable);
+  if (probeTableEntry->num_records > buildTableEntry->num_records) {
+    std::swap(probeTableEntry, buildTableEntry);
   }
 
   // get the name of the attributes in the build table that is supposed to be
@@ -35,16 +36,20 @@ void initializeJoinHash(const hsql::SelectStatement *selectStatement,
   // statement
   std::string joinStatementAttribute =
       selectStatement->fromTable->join->condition->expr->name;
-
-  for (auto &attr : buildTable.getAttributes()) {
+  // copy attr list of builtable to a list
+  std::list<Attribute> *buildTableAttrList =
+      buildTableEntry->getAttributesRef();
+  for (auto &attr : *buildTableAttrList) {
     // get attributes in the join statement
 
     if (joinStatementAttribute == attr.name) {
       // buildTableIndexAttributes.push_back(attr.name);
       // create index on the attribute
       attr.isIndexed = true;
+
       // create index on the attribute
       attr.bPlusTreeContainer = new BPlusTreeContainer(attr.name);
+      break;
     }
   }
 }

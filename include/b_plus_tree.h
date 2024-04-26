@@ -97,10 +97,9 @@ private:
   // create new root
   void createNewRoot(BPlusTree_Node *lChild, BPlusTree_Node *rChild);
 
+public:
   // create/build tree
   int buildTree();
-
-public:
   // constructor
   BPlusTree(Attribute *attr, RelationCatalogEntry *entry, int core);
 
@@ -119,3 +118,8 @@ public:
 // template class BPlusTree<double>;
 template class BPlusTree<int>;
 template class BPlusTree<std::string>;
+
+// SELECT Table_A.Column_1_Table_A ,
+// Table_B.Column_1_Table_B,Table_A.Column_3_Table_A , Table_B.Column_3_Table_B
+// FROM Table_A INNER JOIN Table_B ON Table_A.Column_3_Table_A =
+// Table_B.Column_3_Table_B;

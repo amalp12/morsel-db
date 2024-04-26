@@ -14,6 +14,20 @@ std::list<Attribute> RelationCatalogEntry::getAttributes() {
   return attributeList;
 }
 
+std::list<Attribute> *RelationCatalogEntry::getAttributesRef() {
+  return &attributeList;
+}
+
+RelationCatalogEntry *
+RelationCatalog::getTableEntryRef(const std::string &tableName) {
+  for (auto iter = catList.begin(); iter != catList.end(); iter++) {
+    if (tableName == iter->getTableName()) {
+      return &(*iter);
+    }
+  }
+  return nullptr;
+}
+
 int RelationCatalogEntry::setTableName(const std::string &name) {
   tableName = name;
   return 0;

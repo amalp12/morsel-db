@@ -87,13 +87,13 @@ bool fn_join_loop(LoopFnArgs args) {
 
   // if the table is not found
   if (ret != 0) {
-    std::cout << "Table not found\n";
+    std::cout << "Table not found kashu\n";
     return -1;
   }
 
   StaticVars staticVar;
 
-  if (!args.joinArgs.probeTableAttr->isIndexed) {
+  if (not(args.joinArgs.buildTableAttr->isIndexed)) {
     for (int probing_core = 1; probing_core <= staticVar.getNumberOfCores();
          probing_core++) {
       ReadTupleStream *build_table_input_ts =
@@ -139,7 +139,7 @@ bool fn_join_loop(LoopFnArgs args) {
     // Write code for bplus tree search
     // get the bplus tree container
     BPlusTreeContainer *bPlusTreeContainer =
-        args.joinArgs.probeTableAttr->bPlusTreeContainer;
+        args.joinArgs.buildTableAttr->bPlusTreeContainer;
 
     RelationCatalogEntry *buildTableEntry = new RelationCatalogEntry();
 
@@ -154,6 +154,7 @@ bool fn_join_loop(LoopFnArgs args) {
         BPlusTree<int> *bPlusTree =
             new BPlusTree<int>(args.joinArgs.buildTableAttr, buildTableEntry,
                                args.joinArgs.coreNum);
+        bPlusTree->buildTree();
         bPlusTreeContainer->setTreeRef((void *)bPlusTree,
                                        args.joinArgs.coreNum);
       }
@@ -162,6 +163,7 @@ bool fn_join_loop(LoopFnArgs args) {
         BPlusTree<std::string> *bPlusTree =
             new BPlusTree<std::string>(args.joinArgs.buildTableAttr,
                                        buildTableEntry, args.joinArgs.coreNum);
+        bPlusTree->buildTree();
         bPlusTreeContainer->setTreeRef((void *)bPlusTree,
                                        args.joinArgs.coreNum);
       }
@@ -175,14 +177,23 @@ bool fn_join_loop(LoopFnArgs args) {
     case INTEGER: {
       BPlusTree<int> *bPlusTreeInt = (BPlusTree<int> *)bPlusTree;
       // search the bplus tree
+
+      Tuple tup;
+      int *probe_input_tuple_val = (int *)tup.getTupleValue(
+          args.joinArgs.probeTableAttr, probe_input_tuple);
       hit_tuple =
           bPlusTreeInt->search(*((int *)probe_input_tuple), args.joinArgs.op);
+      break;
     }
 
     case STRING: {
       BPlusTree<std::string> *bPlusTreeString =
           (BPlusTree<std::string> *)bPlusTree;
-      hit_tuple = bPlusTreeString->search(*((std::string *)probe_input_tuple),
+      Tuple tup;
+      char *probe_input_tuple_val = (char *)tup.getTupleValue(
+          args.joinArgs.probeTableAttr, probe_input_tuple);
+
+      hit_tuple = bPlusTreeString->search(std::string(probe_input_tuple_val),
                                           args.joinArgs.op);
       break;
     }

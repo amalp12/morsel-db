@@ -1,3 +1,4 @@
+#include "relcat.h"
 #include "static.h"
 #include "test.h"
 #include <algorithm>
@@ -115,9 +116,9 @@ int create_table_test() {
 }
 
 int create_table_test_random(std::string tableName) {
-  // SELECT Table_A.Column_1_Table_A , Table_B.Column_1_Table_B ,
-  // Table_A.Column_2_Table_A , Table_B.Column_2_Table_B FROM Table_A INNER JOIN
-  // Table_B ON Table_A.Column_2_Table_A = Table_B.Column_2_Table_B; staticvars
+  /** SELECT Table_A.Column_1_Table_A , Table_B.Column_1_Table_B
+   * ,Table_A.Column_2_Table_A , Table_B.Column_2_Table_B FROM Table_A INNER
+   * JOINTable_B ON Table_A.Column_2_Table_A = Table_B.Column_2_Table_B;*/
   StaticVars staticVars;
   std::list<std::string> colNameList;
   std::list<int> colTypeList;
@@ -156,7 +157,7 @@ int create_table_test_random(std::string tableName) {
   relCat.insertNewTable(tableName, colNameList, colTypeList);
 
   RelationCatalogEntry *entry = new RelationCatalogEntry();
-  relCat.getTableEntry(tableName, entry);
+  entry = RelationCatalog::getTableEntryRef(tableName);
   entry->num_records = num_records;
 
   // initMorsel(0 , tableName);
@@ -257,7 +258,7 @@ int insertRowsRandom(std::list<int> colTypeList, std::string tableName) {
   //    std::uniform_int_distribution<int> distribution(10000, 100000);
   int num_rows;
 
-  std::uniform_int_distribution<int> distribution(100000, 400000);
+  std::uniform_int_distribution<int> distribution(4000, 10000);
   num_rows = distribution(gen);
 
   //    int num_rows = distribution(gen);

@@ -17,7 +17,7 @@ int getAttributeSizeFromType(int type) {
 }
 
 bool BPlusTreeContainer::isIndexedForCoreNumber(int coreNumber) {
-  if (this->bPlusTreeRef && this->bPlusTreeRef[coreNumber] != NULL) {
+  if (this->bPlusTreeRef && this->bPlusTreeRef[coreNumber - 1] != NULL) {
     return true;
   }
   return false;
@@ -44,15 +44,16 @@ BPlusTreeContainer::BPlusTreeContainer(std::string tableName) {
 }
 
 int BPlusTreeContainer::setTreeRef(void *treeRef, int coreNumber) {
-  if (coreNumber < 0 || coreNumber >= this->size || treeRef == NULL ||
-      this->bPlusTreeRef[coreNumber] != NULL) {
+
+  if (coreNumber <= 0 || coreNumber > this->size || treeRef == NULL ||
+      this->bPlusTreeRef[coreNumber - 1] != NULL) {
     return FAILURE;
   }
-  this->bPlusTreeRef[coreNumber] = treeRef;
+  this->bPlusTreeRef[coreNumber - 1] = treeRef;
 
   return SUCCESS;
 }
 
 void *BPlusTreeContainer::getTreeRef(int coreNumber) {
-  return this->bPlusTreeRef[coreNumber];
+  return this->bPlusTreeRef[coreNumber - 1];
 }

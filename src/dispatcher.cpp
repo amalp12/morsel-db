@@ -209,49 +209,64 @@ int QEP::handleJoin(int coreNum, const hsql::SelectStatement *selectStatement) {
   auto joinStatement = selectStatement->fromTable->join;
   // operator type
   auto opType = joinStatement->condition->opType;
-  // left table
+  // probe table
   auto leftTableName = joinStatement->left->name;
-  // right table
+  // build table
   auto rightTableName = joinStatement->right->name;
-  std::string rightTableNameStr(rightTableName);
-  // left expression
+  std::string buildTableNameStr(rightTableName);
+  // probe expression
   auto leftColumnName = joinStatement->condition->expr->name;
-  // left expression type
-  // auto leftExprType = leftExpr->type;
+  // probe expression type
+  // auto probeExprType = probeExpr->type;
 
-  // right expression
+  // build expression
   auto rightColumnName = joinStatement->condition->expr2->name;
-  // right expression type
-  // auto rightExprType = rightExpr->type;
-
+  // build expression type
+  // auto buildExprType = buildExpr->type;
   RelationCatalog RELCAT;
 
-  // get left table entry
-  RelationCatalogEntry *leftTableEntry = new RelationCatalogEntry();
-  int ret = RELCAT.getTableEntry(leftTableName, leftTableEntry);
+  // get probe table entry
+  RelationCatalogEntry *probeTableEntry =
+      RelationCatalog::getTableEntryRef(leftTableName);
 
   // if the table is not found
-  if (ret != 0) {
+  if (not probeTableEntry) {
     std::cout << "Table not found\n";
     return FAILURE;
   }
 
-  // get right table entry
-  RelationCatalogEntry *rightTableEntry = new RelationCatalogEntry();
-  ret = RELCAT.getTableEntry(rightTableName, rightTableEntry);
+  // get build table entry
+  RelationCatalogEntry *buildTableEntry =
+      RelationCatalog::getTableEntryRef(rightTableName);
 
   // if the table is not found
-  if (ret != 0) {
+  if (not buildTableEntry) {
     std::cout << "Table not found\n";
     return FAILURE;
   }
+
+  // build table name
+
+  std::string probeColumnName(leftColumnName), buildColumnName(rightColumnName);
+  if (probeTableEntry->num_records > buildTableEntry->num_records) {
+    // swap manumally
+    RelationCatalogEntry *temp = probeTableEntry;
+    probeTableEntry = buildTableEntry;
+    buildTableEntry = temp;
+
+    probeColumnName = rightColumnName;
+    buildColumnName = leftColumnName;
+  }
+
+  auto probeTableName = probeTableEntry->getTableName();
+  auto buildTableName = buildTableEntry->getTableName();
 
   // create a list for the selected columns
   std::list<std::string> selectedColNameList;
   std::list<int> selectedColTypeList;
 
-  auto columnsListLeft = leftTableEntry->getAttributes();
-  auto columnsListRight = rightTableEntry->getAttributes();
+  auto columnsListProbe = probeTableEntry->getAttributes();
+  auto columnsListBuild = buildTableEntry->getAttributes();
 
   // Parse columns
   for (const auto &column : *(selectStatement->selectList)) {
@@ -261,7 +276,7 @@ int QEP::handleJoin(int coreNum, const hsql::SelectStatement *selectStatement) {
 
       // search the columnslist for the column name and append that
       // Attribute to the selectedColumnslist
-      for (auto &attribute : columnsListLeft) {
+      for (auto &attribute : columnsListProbe) {
         if (attribute.name == column->name) {
           selectedColNameList.emplace_back(attribute.name);
           selectedColTypeList.emplace_back(attribute.type);
@@ -270,7 +285,7 @@ int QEP::handleJoin(int coreNum, const hsql::SelectStatement *selectStatement) {
       }
 
       if (hit == false) {
-        for (auto &attribute : columnsListRight) {
+        for (auto &attribute : columnsListBuild) {
           if (attribute.name == column->name) {
             selectedColNameList.emplace_back(attribute.name);
             selectedColTypeList.emplace_back(attribute.type);
@@ -281,18 +296,18 @@ int QEP::handleJoin(int coreNum, const hsql::SelectStatement *selectStatement) {
     }
   }
 
-  Attribute *leftAttr;
-  Attribute *rightAttr;
+  Attribute *probeAttr;
+  Attribute *buildAttr;
 
-  for (auto &attribute : columnsListLeft) {
-    if (attribute.name == leftColumnName) {
-      leftAttr = &(attribute);
+  for (auto &attribute : columnsListProbe) {
+    if (attribute.name == probeColumnName) {
+      probeAttr = &(attribute);
     }
   }
 
-  for (auto &attribute : columnsListRight) {
-    if (attribute.name == rightColumnName) {
-      rightAttr = &(attribute);
+  for (auto &attribute : columnsListBuild) {
+    if (attribute.name == buildColumnName) {
+      buildAttr = &(attribute);
     }
   }
 
@@ -300,10 +315,10 @@ int QEP::handleJoin(int coreNum, const hsql::SelectStatement *selectStatement) {
   RELCAT.insertNewTable(tempTableName, selectedColNameList,
                         selectedColTypeList);
 
-  RelationCatalogEntry *newEntry = new RelationCatalogEntry();
-  ret = RELCAT.getTableEntry(tempTableName, newEntry);
+  RelationCatalogEntry *newEntry =
+      RelationCatalog::getTableEntryRef(tempTableName);
 
-  if (ret != 0) {
+  if (not newEntry) {
     std::cout << "Table Not Found!";
     return FAILURE;
   }
@@ -311,40 +326,48 @@ int QEP::handleJoin(int coreNum, const hsql::SelectStatement *selectStatement) {
   // call seleect fn loop
   union LoopFnArgs args;
 
-  args.joinArgs.probe_ts = new ReadTupleStream(leftTableEntry, coreNum);
+  args.joinArgs.probe_ts = new ReadTupleStream(probeTableEntry, coreNum);
 
   args.joinArgs.output_ts = new WriteTupleStream(newEntry, coreNum);
 
-  args.joinArgs.probeTableAttr = leftAttr;
-  args.joinArgs.buildTableAttr = rightAttr;
-  args.joinArgs.buildTableName = &rightTableNameStr;
+  args.joinArgs.probeTableAttr = probeAttr;
+  args.joinArgs.buildTableAttr = buildAttr;
+  args.joinArgs.buildTableName = &buildTableNameStr;
   args.joinArgs.entrySize = args.joinArgs.output_ts->getEntrySize();
+  args.joinArgs.coreNum = coreNum;
   switch (opType) {
-  case hsql::kOpEquals:
+  case hsql::kOpEquals: {
     args.joinArgs.op = EQUAL;
-    break;
-
-  case hsql::kOpGreater:
-    args.joinArgs.op = GREATER_THAN;
-
-  case hsql::kOpGreaterEq:
-    args.joinArgs.op = GREATER_THAN_OR_EQUAL;
-    break;
-
-  case hsql::kOpLess:
-    args.joinArgs.op = LESS_THAN;
-
-  case hsql::kOpLessEq:
-    args.joinArgs.op = LESS_THAN_OR_EQUAL;
-
-  default:
     break;
   }
 
-  args.joinArgs.coreNum = coreNum;
+  case hsql::kOpGreater: {
+    args.joinArgs.op = GREATER_THAN;
+    break;
+  }
+
+  case hsql::kOpGreaterEq: {
+    args.joinArgs.op = GREATER_THAN_OR_EQUAL;
+    break;
+  }
+  case hsql::kOpLess: {
+    args.joinArgs.op = LESS_THAN;
+    break;
+  }
+  case hsql::kOpLessEq: {
+    args.joinArgs.op = LESS_THAN_OR_EQUAL;
+    break;
+  }
+
+  default: {
+    break;
+  }
+  }
+
   Operator::loop(fn_join_loop, args, JOIN_FN_IDENTIFIER);
 
-  std::string output_file_name = "/home/ssl/Code/db/out/temp_join_result_" +
+  std::string output_file_name = get_env_var("ROOTDIR") +
+                                 "/out/temp_join_result_" +
                                  std::to_string(coreNum) + ".csv";
 
   args.joinArgs.output_ts->writeStream(output_file_name);
@@ -367,8 +390,8 @@ int QEP::handleSelect(int coreNum) {
     break;
   }
   case hsql::kTableJoin: {
-    // std::cout << "Join Table: " << joinTable->left->name << " " <<
-    // joinTable->right->name << std::endl; std::cout << "Join Condition
+    // std::cout << "Join Table: " << joinTable->probe->name << " " <<
+    // joinTable->build->name << std::endl; std::cout << "Join Condition
     // Operator Type: " << joinTable->condition->opType << std::endl;
     retVal = handleJoin(coreNum, selectStatement);
     break;

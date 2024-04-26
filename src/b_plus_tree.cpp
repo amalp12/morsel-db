@@ -196,7 +196,7 @@ int BPlusTree<T>::insertIntoLeaf(
     }
   } else { // if leaf is not full
     // copy the values from the indices array to the leaf block
-    for (int i = 0; i < numEntries + 1; i++) {
+    for (int i = 0; i < numEntries; i++) {
       leafNode->units[i] = *indices[i];
     }
     leafNode->incrementNumberOfFilledUnits();
@@ -328,8 +328,8 @@ template <typename T> void *BPlusTree<T>::search(T attrVal, int op) {
         break;
       }
       // block = next block in the linked list, i.e., the rblock in leafHead.
-      leafNode = leafNode->next;
     }
+    leafNode = leafNode->next;
   }
 
   return nullptr;
@@ -481,7 +481,7 @@ int BPlusTree<T>::insertIntoInternal(T attrVal,
     }
   } else { // if leaf is not full
     // copy the values from the indices array to the leaf block
-    for (int i = 0; i < numEntries + 1; i++) {
+    for (int i = 0; i < numEntries; i++) {
       internalNode->units[i] = *indices[i];
     }
     internalNode->incrementNumberOfFilledUnits();

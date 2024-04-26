@@ -19,6 +19,8 @@ public:
   RelationCatalogEntry();
   std::string getTableName();
   std::list<Attribute> getAttributes();
+  std::list<Attribute> *getAttributesRef();
+
   int setTableName(const std::string &name);
   int setAttributes(const std::list<std::string> &colNameList,
                     const std::list<int> &colTypeList);
@@ -38,6 +40,7 @@ public:
                             const std::list<Attribute> &attrs);
   static int getTableEntry(const std::string &tableName,
                            RelationCatalogEntry *vesselPtr);
+  static RelationCatalogEntry *getTableEntryRef(const std::string &tableName);
   static void deleteRelcat();
 
   static int appendToThreadMapMorsel(const std::string &tableName, int core,
