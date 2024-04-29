@@ -28,6 +28,7 @@ public:
   T key;
   BPlusTree_Node *left_child;
   BPlusTree_Node *right_child;
+  BPlusTree_NodeUnit();
 };
 
 // Leaf Unit of type TK for key and  TV for value
@@ -57,14 +58,14 @@ public:
   BPlusTree_LeafNode<T> *next;
   BPlusTree_LeafNode<T> *prev;
   BPlusTree_LeafNode<T>();
-  BPlusTree_LeafUnit<T> units[MAX_KEYS_LEAF];
+  BPlusTree_LeafUnit<T> units[MAX_KEYS_LEAF] = {};
 };
 
 // Internal Node
 template <typename T> class BPlusTree_InternalNode : public BPlusTree_Node {
 public:
   BPlusTree_InternalNode<T>();
-  BPlusTree_InternalUnit<T> units[MAX_KEYS_INTERNAL];
+  BPlusTree_InternalUnit<T> units[MAX_KEYS_INTERNAL] = {};
 };
 
 template <typename T> class BPlusTree {
@@ -75,24 +76,24 @@ private:
   int coreNumber;
 
   // find leaf to insert
-  BPlusTree_LeafNode<T> *findLeafNodeToInsert(T attrVal);
+  BPlusTree_LeafNode<T> *findLeafNodeToInsert(T attrValPtr);
 
   // insert into leaf
-  int insertIntoLeaf(T attrVal, void *reference,
+  int insertIntoLeaf(T attrValPtr, void *reference,
                      BPlusTree_LeafNode<T> *leafNode);
 
   // split leaf
   BPlusTree_LeafNode<T> *splitLeaf(BPlusTree_LeafNode<T> *leafNode,
-                                   BPlusTree_LeafUnit<T> **indices);
+                                   BPlusTree_LeafUnit<T> *indices);
 
   // insert into internal
-  int insertIntoInternal(T attrVal, BPlusTree_InternalNode<T> *internalNode,
+  int insertIntoInternal(T attrValPtr, BPlusTree_InternalNode<T> *internalNode,
                          BPlusTree_Node *lChild, BPlusTree_Node *rChild);
 
   // split internal
   BPlusTree_InternalNode<T> *
   splitInternal(BPlusTree_InternalNode<T> *internalNode,
-                BPlusTree_InternalUnit<T> **indices);
+                BPlusTree_InternalUnit<T> *indices);
 
   // create new root
   void createNewRoot(BPlusTree_Node *lChild, BPlusTree_Node *rChild);
@@ -104,7 +105,7 @@ public:
   BPlusTree(Attribute *attr, RelationCatalogEntry *entry, int core);
 
   // insert
-  int insert(T attrVal, void *reference);
+  int insert(T attrValPtr, void *reference);
 
   // search
   void *search(T attrVal, int op);
@@ -116,10 +117,12 @@ public:
 };
 
 // template class BPlusTree<double>;
-template class BPlusTree<int>;
-template class BPlusTree<std::string>;
-
+template class BPlusTree<int *>;
+template class BPlusTree<char *>;
 // SELECT Table_A.Column_1_Table_A ,
 // Table_B.Column_1_Table_B,Table_A.Column_3_Table_A , Table_B.Column_3_Table_B
+// FROM Table_A INNER JOIN Table_B ON Table_A.Column_3_Table_A =
+// Table_B.Column_3_Table_B;SELECT Table_A.Column_1_Table_A
+// ,Table_B.Column_1_Table_B,Table_A.Column_3_Table_A , Table_B.Column_3_Table_B
 // FROM Table_A INNER JOIN Table_B ON Table_A.Column_3_Table_A =
 // Table_B.Column_3_Table_B;

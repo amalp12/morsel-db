@@ -30,7 +30,7 @@ void initMorsel(int core, std::string tableName, int start_index,
   RelationCatalog relCat;
   Row *destination = new Row();
   std::string codebase = get_env_var("ROOTDIR");
-  std::ifstream file(codebase + "/in/test_table.csv");
+  std::ifstream file(codebase + "/in/" + tableName + ".csv");
 
   if (!file.is_open()) {
     std::cerr << "Failed to open file!" << std::endl;
@@ -77,13 +77,13 @@ void initMorsel(int core, std::string tableName, int start_index,
   delete destination;
 }
 
-int create_table_test() {
+int create_table_test(std::string tableName) {
   // staticvars
   StaticVars staticVars;
 
   RelationCatalog relCat;
   // SELECT Name FROM test_table WHERE Age > 25;
-  std::string tableName = "test_table";
+  // std::string tableName = "test_table";
   std::list<std::string> colNameList = {"ID", "Name", "Age"};
   std::list<int> colTypeList = {INTEGER, STRING, INTEGER};
   relCat.insertNewTable(tableName, colNameList, colTypeList);
@@ -91,7 +91,7 @@ int create_table_test() {
   // initMorsel(0 , tableName);
   // Create threads
   std::vector<std::thread> threads;
-  std::string filename = get_env_var("ROOTDIR") + "/in/test_table.csv";
+  std::string filename = get_env_var("ROOTDIR") + "/in/" + tableName + ".csv";
 
   std::ifstream file(filename);
   int total_lines = std::count(std::istreambuf_iterator<char>(file),

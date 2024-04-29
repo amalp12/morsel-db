@@ -45,11 +45,12 @@ void initializeJoinHash(const hsql::SelectStatement *selectStatement,
     if (joinStatementAttribute == attr.name) {
       // buildTableIndexAttributes.push_back(attr.name);
       // create index on the attribute
-      attr.isIndexed = true;
-
-      // create index on the attribute
-      attr.bPlusTreeContainer = new BPlusTreeContainer(attr.name);
-      break;
+      if (!attr.isIndexed) {
+        attr.isIndexed = true;
+        // create index on the attribute
+        attr.bPlusTreeContainer = new BPlusTreeContainer(attr.name);
+        break;
+      }
     }
   }
 }

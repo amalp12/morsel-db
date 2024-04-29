@@ -144,7 +144,5 @@ void parseSelectStatement(const hsql::SQLStatement *statement) {
   }
 }
 
-int compareAttrs(int val1, int val2, int operatorType) { return val1 - val2; }
-int compareAttrs(std::string val1, std::string val2, int operatorType) {
-  return val1.compare(val2);
-}
+int compareAttrs(int *val1, int *val2) { return (*val1) - (*val2); }
+int compareAttrs(char *val1, char *val2) { return std::strcmp(val1, val2); }

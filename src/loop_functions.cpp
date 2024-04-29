@@ -151,18 +151,18 @@ bool fn_join_loop(LoopFnArgs args) {
 
     if (!bPlusTreeContainer->isIndexedForCoreNumber(args.joinArgs.coreNum)) {
       if (args.joinArgs.probeTableAttr->type == INTEGER) {
-        BPlusTree<int> *bPlusTree =
-            new BPlusTree<int>(args.joinArgs.buildTableAttr, buildTableEntry,
-                               args.joinArgs.coreNum);
+        BPlusTree<int *> *bPlusTree =
+            new BPlusTree<int *>(args.joinArgs.buildTableAttr, buildTableEntry,
+                                 args.joinArgs.coreNum);
         bPlusTree->buildTree();
         bPlusTreeContainer->setTreeRef((void *)bPlusTree,
                                        args.joinArgs.coreNum);
       }
 
       else if (args.joinArgs.probeTableAttr->type == STRING) {
-        BPlusTree<std::string> *bPlusTree =
-            new BPlusTree<std::string>(args.joinArgs.buildTableAttr,
-                                       buildTableEntry, args.joinArgs.coreNum);
+        BPlusTree<char *> *bPlusTree =
+            new BPlusTree<char *>(args.joinArgs.buildTableAttr, buildTableEntry,
+                                  args.joinArgs.coreNum);
         bPlusTree->buildTree();
         bPlusTreeContainer->setTreeRef((void *)bPlusTree,
                                        args.joinArgs.coreNum);
@@ -175,25 +175,24 @@ bool fn_join_loop(LoopFnArgs args) {
     switch (args.joinArgs.probeTableAttr->type) {
 
     case INTEGER: {
-      BPlusTree<int> *bPlusTreeInt = (BPlusTree<int> *)bPlusTree;
+      BPlusTree<int *> *bPlusTreeInt = (BPlusTree<int *> *)bPlusTree;
       // search the bplus tree
 
       Tuple tup;
       int *probe_input_tuple_val = (int *)tup.getTupleValue(
           args.joinArgs.probeTableAttr, probe_input_tuple);
       hit_tuple =
-          bPlusTreeInt->search(*((int *)probe_input_tuple), args.joinArgs.op);
+          bPlusTreeInt->search(((int *)probe_input_tuple), args.joinArgs.op);
       break;
     }
 
     case STRING: {
-      BPlusTree<std::string> *bPlusTreeString =
-          (BPlusTree<std::string> *)bPlusTree;
+      BPlusTree<char *> *bPlusTreeString = (BPlusTree<char *> *)bPlusTree;
       Tuple tup;
       char *probe_input_tuple_val = (char *)tup.getTupleValue(
           args.joinArgs.probeTableAttr, probe_input_tuple);
 
-      hit_tuple = bPlusTreeString->search(std::string(probe_input_tuple_val),
+      hit_tuple = bPlusTreeString->search((char *)(probe_input_tuple_val),
                                           args.joinArgs.op);
       break;
     }

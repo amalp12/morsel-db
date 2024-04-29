@@ -23,7 +23,7 @@ void BPlusTree_Node::setParent(BPlusTree_Node *parent) {
 }
 
 BPlusTree_Node::BPlusTree_Node(int type) {
-  this->parent = NULL;
+  this->parent = nullptr;
   this->node_type = type;
   this->number_of_filled_units = 0;
 }
@@ -48,7 +48,11 @@ void BPlusTree_Node::decrementNumberOfFilledUnits() {
 }
 
 template <typename T>
-BPlusTree_LeafNode<T>::BPlusTree_LeafNode() : BPlusTree_Node(LEAF_NODE) {}
+BPlusTree_LeafNode<T>::BPlusTree_LeafNode() : BPlusTree_Node(LEAF_NODE) {
+  this->next = nullptr;
+  this->prev = nullptr;
+  this->parent = nullptr;
+}
 
 template <typename T>
 BPlusTree_InternalNode<T>::BPlusTree_InternalNode()
@@ -66,7 +70,12 @@ BPlusTree_InternalUnit<T>::BPlusTree_InternalUnit(T key, BPlusTree_Node *left,
   this->left_child = left;
   this->right_child = right;
 }
-template <typename T> BPlusTree_LeafUnit<T>::BPlusTree_LeafUnit() {}
+template <typename T> BPlusTree_LeafUnit<T>::BPlusTree_LeafUnit() {
+  this->key = nullptr;
+  this->reference = nullptr;
+  this->left_child = nullptr;
+  this->right_child = nullptr;
+}
 template <typename T>
 BPlusTree_LeafUnit<T>::BPlusTree_LeafUnit(T key, void *reference,
                                           BPlusTree_Node *left,
@@ -78,8 +87,14 @@ BPlusTree_LeafUnit<T>::BPlusTree_LeafUnit(T key, void *reference,
   this->right_child = right;
 }
 
+template <typename T> BPlusTree_NodeUnit<T>::BPlusTree_NodeUnit() {
+  this->key = nullptr;
+  this->left_child = nullptr;
+  this->right_child = nullptr;
+}
+
 template <typename T>
-BPlusTree_LeafNode<T> *BPlusTree<T>::findLeafNodeToInsert(T attrVal) {
+BPlusTree_LeafNode<T> *BPlusTree<T>::findLeafNodeToInsert(T attrValPtr) {
 
   // get the root node
   BPlusTree_Node *nodePtr = root;
@@ -90,7 +105,10 @@ BPlusTree_LeafNode<T> *BPlusTree<T>::findLeafNodeToInsert(T attrVal) {
 
     int index = 0;
     for (; index < internalNode->getNumberOfFilledUnits(); index++) {
-      if (attrVal < internalNode->units[index].key) { // TODO : DOUBLE CHECK
+
+      if (compareAttrs(attrValPtr,
+                       internalNode->units[index].key) <
+          0) { // if a less than b
         break;
       }
     }
@@ -108,11 +126,11 @@ BPlusTree_LeafNode<T> *BPlusTree<T>::findLeafNodeToInsert(T attrVal) {
 
 template <typename T>
 int BPlusTree<T>::insertIntoLeaf(
-    T attrVal, void *reference,
+    T attrValPtr, void *reference,
     BPlusTree_LeafNode<T> *leafNode) { // TODO : MAKE IT MORE MEMORY EFFICIENT
 
   int numEntries = leafNode->getNumberOfFilledUnits(), response;
-  BPlusTree_LeafUnit<T> *indices[numEntries + 1];
+  BPlusTree_LeafUnit<T> indices[numEntries + 1];
 
   /*
   Iterate through all the entries in the block and copy them to the array
@@ -122,18 +140,20 @@ int BPlusTree<T>::insertIntoLeaf(
   int indicesArrayIndex = 0, recordEntry = 0;
   bool inserted = false;
 
-  auto newEntry =
-      new BPlusTree_LeafUnit<T>(attrVal, reference, nullptr, nullptr);
+  BPlusTree_LeafUnit<T> *newEntry =
+      new BPlusTree_LeafUnit<T>(attrValPtr, reference, nullptr, nullptr);
+  const int numOfInitialEntries = leafNode->getNumberOfFilledUnits();
+  for (; recordEntry < numOfInitialEntries; recordEntry++) {
 
-  for (; recordEntry < numEntries; recordEntry++) {
-
-    indices[indicesArrayIndex] = &(leafNode->units[recordEntry]);
+    indices[indicesArrayIndex] = leafNode->units[recordEntry];
 
     // TODO : DOUBLE CHECK and IMPLEMENT COMPARE ATTRS
     // TODO : fix leaf node insertion. no left and right child for leaf
-    if (!inserted && indices[indicesArrayIndex]->key >= attrVal) {
+    if (!inserted && compareAttrs(indices[indicesArrayIndex].key,
+                                  attrValPtr) >=
+                         0) { // greater than or equal to 0 means a >= b
       indices[indicesArrayIndex + 1] = indices[indicesArrayIndex];
-      indices[indicesArrayIndex] = newEntry;
+      indices[indicesArrayIndex] = *newEntry;
       indicesArrayIndex++;
       numEntries++;
       inserted = true;
@@ -145,10 +165,12 @@ int BPlusTree<T>::insertIntoLeaf(
   // TODO : fix inserting into leaf node since leaf nodes do not have a left and
   // right child.(checl code below)
   if (!inserted) {
-    indices[indicesArrayIndex] = newEntry;
+    indices[indicesArrayIndex] = *newEntry;
     numEntries++;
   }
 
+  // delete new entry
+  delete newEntry;
   // if leaf is full
   if (numEntries == MAX_KEYS_LEAF) {
     // split the leaf
@@ -175,7 +197,7 @@ int BPlusTree<T>::insertIntoLeaf(
       // newRightBlk and pass it as argument to
 
       response =
-          insertIntoInternal(indices[MIDDLE_INDEX_LEAF]->key,
+          insertIntoInternal(indices[MIDDLE_INDEX_LEAF].key,
                              (BPlusTree_InternalNode<T> *)leafNode->parent,
                              leafNode, newRightChild);
 
@@ -197,7 +219,7 @@ int BPlusTree<T>::insertIntoLeaf(
   } else { // if leaf is not full
     // copy the values from the indices array to the leaf block
     for (int i = 0; i < numEntries; i++) {
-      leafNode->units[i] = *indices[i];
+      leafNode->units[i] = indices[i];
     }
     leafNode->incrementNumberOfFilledUnits();
   }
@@ -249,7 +271,7 @@ template <typename T> void *BPlusTree<T>::search(T attrVal, int op) {
       while (index < numberOfUnits) {
 
         // TODO : Implement Compare Attrs
-        int cmpVal; //= compareAttrs(internalNode->units[index].key, attrVal);
+        int cmpVal = compareAttrs(internalNode->units[index].key, attrVal);
         if (((op == EQUAL || op == GREATER_THAN_OR_EQUAL) && cmpVal >= 0) ||
             (op == GREATER_THAN && cmpVal > 0)) {
           break;
@@ -286,7 +308,7 @@ template <typename T> void *BPlusTree<T>::search(T attrVal, int op) {
     for (int index = 0; index < numberOfUnits; index++) {
 
       // TODO : Implement compareAttrs
-      int cmpVal = compareAttrs(leafNode->units[index].key, attrVal, op);
+      int cmpVal = compareAttrs(leafNode->units[index].key, attrVal);
 
       // calculate cmpVal fro integer and string
       // switch (this->attribute->type) {
@@ -335,14 +357,14 @@ template <typename T> void *BPlusTree<T>::search(T attrVal, int op) {
   return nullptr;
 }
 
-template <typename T> int BPlusTree<T>::insert(T attrVal, void *reference) {
+template <typename T> int BPlusTree<T>::insert(T attrValPtr, void *reference) {
 
   // find the leaf block to which insertion is to be done using the
   // findLeafToInsert() function
-  BPlusTree_LeafNode<T> *leafNode = findLeafNodeToInsert(attrVal);
+  BPlusTree_LeafNode<T> *leafNode = findLeafNodeToInsert(attrValPtr);
 
   // insert the value into the leaf block using the insertIntoLeaf() function
-  int response = insertIntoLeaf(attrVal, reference, leafNode);
+  int response = insertIntoLeaf(attrValPtr, reference, leafNode);
 
   // if the insertion fails
   switch (response) {
@@ -356,9 +378,8 @@ template <typename T> int BPlusTree<T>::insert(T attrVal, void *reference) {
 }
 
 template <typename T>
-BPlusTree_LeafNode<T> *
-BPlusTree<T>::splitLeaf(BPlusTree_LeafNode<T> *leafNode,
-                        BPlusTree_LeafUnit<T> **indices) {
+BPlusTree_LeafNode<T> *BPlusTree<T>::splitLeaf(BPlusTree_LeafNode<T> *leafNode,
+                                               BPlusTree_LeafUnit<T> *indices) {
 
   // create a new leaf block
   BPlusTree_LeafNode<T> *newRightBlock = new BPlusTree_LeafNode<T>();
@@ -369,8 +390,8 @@ BPlusTree<T>::splitLeaf(BPlusTree_LeafNode<T> *leafNode,
   const int leftNumberOfEntries = (MAX_KEYS_LEAF + 1) / 2;
 
   for (int i = 0; i < leftNumberOfEntries; ++i) {
-    leafNode->units[i] = *indices[i];
-    newRightBlock->units[i] = *indices[MIDDLE_INDEX_LEAF + i + 1];
+    leafNode->units[i] = indices[i];
+    newRightBlock->units[i] = indices[MIDDLE_INDEX_LEAF + i + 1];
   }
 
   // set new right child fields
@@ -385,12 +406,12 @@ BPlusTree<T>::splitLeaf(BPlusTree_LeafNode<T> *leafNode,
 }
 
 template <typename T>
-int BPlusTree<T>::insertIntoInternal(T attrVal,
+int BPlusTree<T>::insertIntoInternal(T attrValPtr,
                                      BPlusTree_InternalNode<T> *internalNode,
                                      BPlusTree_Node *lChild,
                                      BPlusTree_Node *rChild) {
   int numEntries = internalNode->getNumberOfFilledUnits(), response;
-  BPlusTree_InternalUnit<T> *indices[numEntries + 1];
+  BPlusTree_InternalUnit<T> indices[numEntries + 1];
 
   /*
   Iterate through all the entries in the block and copy them to the array
@@ -400,15 +421,16 @@ int BPlusTree<T>::insertIntoInternal(T attrVal,
   int indicesArrayIndex = 0, recordEntry = 0;
   bool inserted = false;
 
-  auto newEntry = new BPlusTree_InternalUnit<T>(attrVal, lChild, rChild);
+  auto newEntry = new BPlusTree_InternalUnit<T>(attrValPtr, lChild, rChild);
+  const int numOfInitialEntries = internalNode->getNumberOfFilledUnits();
+  for (; recordEntry < numOfInitialEntries; recordEntry++) {
 
-  for (; recordEntry < numEntries; recordEntry++) {
-
-    indices[indicesArrayIndex] = &(internalNode->units[recordEntry]);
+    indices[indicesArrayIndex] = (internalNode->units[recordEntry]);
 
     // TODO : DOUBLE CHECK and IMPLEMENT COMPARE ATTRS
     // add left and right children
-    if (!inserted && indices[indicesArrayIndex]->key >= attrVal) {
+    if (!inserted && compareAttrs(indices[indicesArrayIndex].key, attrValPtr) >=
+                         0) { // greater than or equal to 0 means a >= b
       // newEntry->left_child = indices[indicesArrayIndex]->left_child;
       // newEntry->right_child = indices[indicesArrayIndex];
       // indices[indicesArrayIndex]->left_child = newEntry;
@@ -417,8 +439,8 @@ int BPlusTree<T>::insertIntoInternal(T attrVal,
       // indices[indicesArrayIndex] = newEntry;
       // indicesArrayIndex++;
       indices[indicesArrayIndex + 1] = indices[indicesArrayIndex];
-      indices[indicesArrayIndex + 1]->left_child = newEntry->right_child;
-      indices[indicesArrayIndex] = newEntry;
+      indices[indicesArrayIndex + 1].left_child = newEntry->right_child;
+      indices[indicesArrayIndex] = *newEntry;
       indicesArrayIndex++;
       numEntries++;
       inserted = true;
@@ -428,13 +450,15 @@ int BPlusTree<T>::insertIntoInternal(T attrVal,
 
   // if still not inserted, insert at the end
   if (!inserted) {
-    indices[indicesArrayIndex] = newEntry;
+    indices[indicesArrayIndex] = *newEntry;
     numEntries++;
     // newEntry->right_child = indices[indicesArrayIndex - 1]->right_child;
     // newEntry->left_child = indices[indicesArrayIndex - 1];
     // newEntry->right_child = indices[indicesArrayIndex + 1];
   }
 
+  // free new entry
+  delete newEntry;
   // if leaf is full
   if (numEntries == MAX_KEYS_INTERNAL) {
     // split the leaf
@@ -460,7 +484,7 @@ int BPlusTree<T>::insertIntoInternal(T attrVal,
       // = newRightBlk and pass it as argument to
 
       response =
-          insertIntoInternal(indices[MIDDLE_INDEX_INTERNAL]->key,
+          insertIntoInternal(indices[MIDDLE_INDEX_INTERNAL].key,
                              (BPlusTree_InternalNode<T> *)internalNode->parent,
                              internalNode, newRightChild);
 
@@ -482,7 +506,7 @@ int BPlusTree<T>::insertIntoInternal(T attrVal,
   } else { // if leaf is not full
     // copy the values from the indices array to the leaf block
     for (int i = 0; i < numEntries; i++) {
-      internalNode->units[i] = *indices[i];
+      internalNode->units[i] = indices[i];
     }
     internalNode->incrementNumberOfFilledUnits();
   }
@@ -492,7 +516,7 @@ int BPlusTree<T>::insertIntoInternal(T attrVal,
 template <typename T>
 BPlusTree_InternalNode<T> *
 BPlusTree<T>::splitInternal(BPlusTree_InternalNode<T> *internalNode,
-                            BPlusTree_InternalUnit<T> **indices) {
+                            BPlusTree_InternalUnit<T> *indices) {
 
   // create a new internal block
   BPlusTree_InternalNode<T> *newRightBlock = new BPlusTree_InternalNode<T>();
@@ -503,8 +527,8 @@ BPlusTree<T>::splitInternal(BPlusTree_InternalNode<T> *internalNode,
   const int leftNumberOfEntries = (MAX_KEYS_INTERNAL + 1) / 2;
 
   for (int i = 0; i < leftNumberOfEntries; ++i) {
-    internalNode->units[i] = *indices[i];
-    newRightBlock->units[i] = *indices[MIDDLE_INDEX_INTERNAL + i + 1];
+    internalNode->units[i] = indices[i];
+    newRightBlock->units[i] = indices[MIDDLE_INDEX_INTERNAL + i + 1];
   }
 
   // set new right child fields
@@ -564,7 +588,7 @@ template <typename T> int BPlusTree<T>::buildTree() {
       void *value = tup.getTupleValue(this->attribute, entry);
 
       // insert into the tree
-      int response = this->insert(*(T *)value, entry);
+      int response = this->insert(((T)value), entry);
       if (response != SUCCESS) {
         return response;
       }
