@@ -6,11 +6,10 @@
 
 // b plus tree max key size
 enum B_PLUS_TREE {
-  MAX_B_PLUS_TREE_KEYS = 3, // Maximum number of keys in a node
   MAX_KEYS_LEAF = 63,
   MAX_KEYS_INTERNAL = 100,
-  MIDDLE_INDEX_INTERNAL = MAX_KEYS_INTERNAL / 2,
-  MIDDLE_INDEX_LEAF = MAX_KEYS_LEAF / 2,
+  MIDDLE_INDEX_INTERNAL = (MAX_KEYS_INTERNAL + 1) / 2,
+  MIDDLE_INDEX_LEAF = (MAX_KEYS_LEAF + 1) / 2,
 };
 
 // error codes

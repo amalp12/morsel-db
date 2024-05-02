@@ -1,6 +1,6 @@
+#include "loop_functions.h"
 #include "b_plus_tree.h"
 #include "constants.h"
-#include "loop_functions.h"
 #include "static.h"
 #include <string>
 
@@ -150,7 +150,7 @@ bool fn_join_loop(LoopFnArgs args) {
     // create bplus tree
 
     if (!bPlusTreeContainer->isIndexedForCoreNumber(args.joinArgs.coreNum)) {
-      if (args.joinArgs.probeTableAttr->type == INTEGER) {
+      if (args.joinArgs.buildTableAttr->type == INTEGER) {
         BPlusTree<int *> *bPlusTree =
             new BPlusTree<int *>(args.joinArgs.buildTableAttr, buildTableEntry,
                                  args.joinArgs.coreNum);
@@ -159,7 +159,7 @@ bool fn_join_loop(LoopFnArgs args) {
                                        args.joinArgs.coreNum);
       }
 
-      else if (args.joinArgs.probeTableAttr->type == STRING) {
+      else if (args.joinArgs.buildTableAttr->type == STRING) {
         BPlusTree<char *> *bPlusTree =
             new BPlusTree<char *>(args.joinArgs.buildTableAttr, buildTableEntry,
                                   args.joinArgs.coreNum);

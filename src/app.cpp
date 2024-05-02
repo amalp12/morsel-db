@@ -61,7 +61,7 @@ int main(int argc, char **argv) {
   // create staticVars
   StaticVars staticVars;
   // set cores and morsel size
-  staticVars.setNumberOfCores(4);
+  staticVars.setNumberOfCores(1);
 
   staticVars.setMaxMorselSize(264000);
   // create_table_test();
@@ -148,3 +148,6 @@ int main(int argc, char **argv) {
 
   return 0;
 }
+
+// SELECT Table_A.Column_1_Table_A FROM Table_A WHERE
+// Table_A.Column_1_Table_A>0;

@@ -26,8 +26,6 @@ public:
 template <typename T> class BPlusTree_NodeUnit {
 public:
   T key;
-  BPlusTree_Node *left_child;
-  BPlusTree_Node *right_child;
   BPlusTree_NodeUnit();
 };
 
@@ -37,8 +35,7 @@ public:
   void *reference;
   // constructor, define key, reference, left and right child with default
   // values
-  BPlusTree_LeafUnit(T key, void *reference, BPlusTree_Node *left,
-                     BPlusTree_Node *right);
+  BPlusTree_LeafUnit(T key, void *reference);
   BPlusTree_LeafUnit();
 };
 
@@ -46,6 +43,8 @@ public:
 template <typename T>
 class BPlusTree_InternalUnit : public BPlusTree_NodeUnit<T> {
 public:
+  BPlusTree_Node *left_child;
+  BPlusTree_Node *right_child;
   // constructor, define key, left and right child with default values
   BPlusTree_InternalUnit(T key, BPlusTree_Node *left = NULL,
                          BPlusTree_Node *right = NULL);
@@ -84,7 +83,7 @@ private:
 
   // split leaf
   BPlusTree_LeafNode<T> *splitLeaf(BPlusTree_LeafNode<T> *leafNode,
-                                   BPlusTree_LeafUnit<T> *indices);
+                                   BPlusTree_LeafUnit<T> indices[]);
 
   // insert into internal
   int insertIntoInternal(T attrValPtr, BPlusTree_InternalNode<T> *internalNode,
@@ -93,10 +92,11 @@ private:
   // split internal
   BPlusTree_InternalNode<T> *
   splitInternal(BPlusTree_InternalNode<T> *internalNode,
-                BPlusTree_InternalUnit<T> *indices);
+                BPlusTree_InternalUnit<T> indices[]);
 
   // create new root
-  void createNewRoot(BPlusTree_Node *lChild, BPlusTree_Node *rChild);
+  void createNewRoot(BPlusTree_Node *lChild, BPlusTree_Node *rChild,
+                     T attrValPtr);
 
 public:
   // create/build tree

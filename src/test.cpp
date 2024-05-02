@@ -1,6 +1,6 @@
+#include "test.h"
 #include "relcat.h"
 #include "static.h"
-#include "test.h"
 #include <algorithm>
 #include <cstdlib>
 #include <fstream>
@@ -258,7 +258,7 @@ int insertRowsRandom(std::list<int> colTypeList, std::string tableName) {
   //    std::uniform_int_distribution<int> distribution(10000, 100000);
   int num_rows;
 
-  std::uniform_int_distribution<int> distribution(4000, 10000);
+  std::uniform_int_distribution<int> distribution(200, 400);
   num_rows = distribution(gen);
 
   //    int num_rows = distribution(gen);
