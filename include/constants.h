@@ -3,6 +3,10 @@
 // #ifndef CONSTANTS_H
 // #define CONSTANTS_H
 #pragma once
+// flags
+enum FLAGS {
+  ALWAYS_LINEAR_SEARCH = true,
+};
 
 // b plus tree max key size
 enum B_PLUS_TREE {

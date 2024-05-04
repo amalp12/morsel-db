@@ -40,6 +40,7 @@ void Operator::loop(std::function<bool(union LoopFnArgs args)> fn,
   if (functionIdentifier == JOIN_FN_IDENTIFIER) {
     // reset the tuple stream
     args.joinArgs.probe_ts->resetStream();
+
     bool ret;
     do {
       ret = fn(args);

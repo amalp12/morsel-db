@@ -1,0 +1,3 @@
+SELECT Table_A.Column_1_Table_A,Table_B.Column_2_Table_B,Table_A.Column_3_Table_A,Table_B.Column_3_Table_B FROM Table_A INNER JOIN Table_B ON Table_A.Column_3_Table_A=Table_B.Column_3_Table_B;
+
+SELECT Table_A.Column_1_Table_A,Table_B.Column_1_Table_B,Table_A.Column_3_Table_A,Table_B.Column_3_Table_B FROM Table_A INNER JOIN Table_B ON Table_A.Column_3_Table_A=Table_B.Column_3_Table_B;

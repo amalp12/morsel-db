@@ -24,8 +24,6 @@ bool BPlusTreeContainer::isIndexedForCoreNumber(int coreNumber) {
 }
 
 BPlusTreeContainer::BPlusTreeContainer(std::string tableName) {
-  // declate relcat object
-  RelationCatalog relCat;
 
   StaticVars staticVars;
 
@@ -37,10 +35,6 @@ BPlusTreeContainer::BPlusTreeContainer(std::string tableName) {
   for (int i = 0; i < this->size; i++) {
     this->bPlusTreeRef[i] = NULL;
   }
-
-  // get relcat entry
-  RelationCatalogEntry relcat_entry;
-  relCat.getTableEntry(tableName, &relcat_entry);
 }
 
 int BPlusTreeContainer::setTreeRef(void *treeRef, int coreNumber) {

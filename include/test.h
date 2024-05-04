@@ -15,11 +15,7 @@ void initMorsel(int core, std::string tableName, int start_index,
 
 int create_table_test();
 
-void createTableMetaAndRows(std::string tableName);
-
 void destructRelcat();
-
-void loadPrevTable();
 
 int insertRowsRandom(std::list<int> colTypeList, std::string tableName);
 

@@ -37,7 +37,7 @@ void *Morsel::getStartPtr() { return startPtr; }
 
 void *Morsel::getNthMorselEntry(int n) {
   int entryWithMetadataSize = entrySize;
-  return (void *)((char *)startPtr + (n * entryWithMetadataSize));
+  return (void *)((char *)this->startPtr + (n * entryWithMetadataSize));
 }
 
 int Morsel::setNthMorselEntry(int n, void *ptr) {

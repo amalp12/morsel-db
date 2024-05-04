@@ -135,7 +135,7 @@ int WriteTupleStream::insert(void *tuple) {
   // if current morsel is exhausted, move to next morsel
   morsel->insertEntry(tuple);
 
-  if (currentIndex >= morsel->getTotalNumberOfEntries()) {
+  if (this->currentIndex >= morsel->getTotalNumberOfEntries()) {
     morsel = morsel->getNext();
     morselStart = morsel->getStartPtr();
     currentIndex = 0;

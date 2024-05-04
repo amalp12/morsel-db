@@ -13,7 +13,6 @@ static void test(int argc, char **argv) {
   // staticvars
   StaticVars staticVars;
   std::string tableName = "test_table";
-  createTableMetaAndRows(tableName);
   int coreNum = 1;
   const int total_cores = 48;
   std::array<int, 7> morsel_sizes{26400000, 13200000, 2640000, 1320000,
@@ -38,7 +37,6 @@ static void test(int argc, char **argv) {
         // create_table_test_random();
 
         for (int t = 0; t < avg_num; t++) {
-          loadPrevTable();
           // create an array of int to store the time for each core
           std::array<int, total_cores> timeArr;
 

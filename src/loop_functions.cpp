@@ -46,13 +46,13 @@ bool fn_select_loop(LoopFnArgs args) {
   void *output_tuple = (void *)malloc(sizeof(char) * output_ts->getEntrySize());
 
   // copy the selected attribute value to the output tuple
-  for (auto attr1 : output_ts->getAttributeList()) {
+  for (const auto output_attr : output_ts->getAttributeList()) {
     // if the attribute is the selected attribute then copy the value to the
     // output tuple
-    for (auto attr2 : input_ts->getAttributeList()) {
-      if (attr1.name == attr2.name) {
-        memcpy((char *)output_tuple + attr1.offset,
-               (char *)input_tuple + attr2.offset, attr1.size);
+    for (const auto input_attr : input_ts->getAttributeList()) {
+      if (input_attr.name == output_attr.name) {
+        memcpy((char *)output_tuple + output_attr.offset,
+               (char *)input_tuple + input_attr.offset, input_attr.size);
         break;
       }
     }
@@ -71,22 +71,19 @@ bool fn_join_loop(LoopFnArgs args) {
   // function identifier
   int fnIdentifier = JOIN_FN_IDENTIFIER;
   ReadTupleStream *probe_table_ts = args.joinArgs.probe_ts;
-
   // build table input tuple is the tuple that is being compared with the probe
   // table build table is the smaller table probe table is the larger table
+  //  ??
   void *probe_input_tuple = probe_table_ts->yieldNext();
   if (probe_input_tuple == NULL) {
     return false;
   }
 
-  RelationCatalogEntry *buildTableEntry = new RelationCatalogEntry();
-
-  RelationCatalog RELCAT;
-  int ret =
-      RELCAT.getTableEntry(*(args.joinArgs.buildTableName), buildTableEntry);
+  RelationCatalogEntry *buildTableEntry =
+      RelationCatalog::getTableEntryRef(*(args.joinArgs.buildTableName));
 
   // if the table is not found
-  if (ret != 0) {
+  if (not buildTableEntry) {
     std::cout << "Table not found kashu\n";
     return -1;
   }
@@ -105,25 +102,29 @@ bool fn_join_loop(LoopFnArgs args) {
       while (build_input_tuple != nullptr) {
         void *output_tuple = (void *)malloc(
             sizeof(char) * args.joinArgs.output_ts->getEntrySize());
-        for (const auto &attr1 : args.joinArgs.output_ts->getAttributeList()) {
+        for (const auto &output_attr :
+             args.joinArgs.output_ts->getAttributeList()) {
           bool hit = false;
           // if the attribute is the selected attribute then copy the value
 
           // the output tuple
-          for (const auto &attr2 : probe_table_ts->getAttributeList()) {
-            if (attr1.name == attr2.name) {
+          for (const auto &probe_attr : probe_table_ts->getAttributeList()) {
+            if (probe_attr.name == output_attr.name) {
               hit = true;
-              memcpy((char *)output_tuple + attr1.offset,
-                     (char *)probe_input_tuple + attr2.offset, attr1.size);
+              memcpy((char *)output_tuple + output_attr.offset,
+                     (char *)probe_input_tuple + probe_attr.offset,
+                     probe_attr.size);
             }
           }
 
           if (hit == false) {
-            for (const auto &attr2 : build_table_input_ts->getAttributeList()) {
-              if (attr1.name == attr2.name) {
+            for (const auto &build_attr :
+                 build_table_input_ts->getAttributeList()) {
+              if (build_attr.name == output_attr.name) {
                 hit = true;
-                memcpy((char *)output_tuple + attr1.offset,
-                       (char *)build_input_tuple + attr2.offset, attr1.size);
+                memcpy((char *)output_tuple + output_attr.offset,
+                       (char *)build_input_tuple + build_attr.offset,
+                       build_attr.size);
               }
             }
           }
@@ -141,11 +142,8 @@ bool fn_join_loop(LoopFnArgs args) {
     BPlusTreeContainer *bPlusTreeContainer =
         args.joinArgs.buildTableAttr->bPlusTreeContainer;
 
-    RelationCatalogEntry *buildTableEntry = new RelationCatalogEntry();
-
-    RelationCatalog RELCAT;
-    int ret =
-        RELCAT.getTableEntry(*(args.joinArgs.buildTableName), buildTableEntry);
+    RelationCatalogEntry *buildTableEntry =
+        RelationCatalog::getTableEntryRef(*(args.joinArgs.buildTableName));
 
     // create bplus tree
 
@@ -197,6 +195,9 @@ bool fn_join_loop(LoopFnArgs args) {
       break;
     }
     default: {
+      // error
+      std::cout << "Error: Invalid type\n";
+      exit(1);
       break;
     }
     }
@@ -204,32 +205,89 @@ bool fn_join_loop(LoopFnArgs args) {
     // if hit tuple is not null then insert the tuple into the output tuple
     // stream
     if (hit_tuple != nullptr) {
+
+      // std::cout << "---Open---\n";
+      // std::cout << "---Hit Tuple---\n";
+      // // print hit tuple
+      // for (const auto &attr : buildTableEntry->getAttributes()) {
+      //   std::cout << "Attribute: " << attr.name << " Value: ";
+      //   if (attr.type == INTEGER) {
+      //     std::cout << *((int *)((char *)hit_tuple + attr.offset)) << "\n";
+
+      //   } else if (attr.type == STRING) {
+      //     std::cout << ((char *)hit_tuple + attr.offset) << "\n";
+      //   }
+      // }
+
+      // for (const auto &attr : probe_table_ts->getAttributeList()) {
+      //   std::cout << "Attribute: " << attr.name << " Value: ";
+      //   if (attr.type == INTEGER) {
+      //     std::cout << *((int *)((char *)hit_tuple + attr.offset)) << "\n";
+
+      //   } else if (attr.type == STRING) {
+      //     std::cout << ((char *)hit_tuple + attr.offset) << "\n";
+      //   }
+      // }
+      // std::cout << "------------------\n";
+
       void *output_tuple = (void *)malloc(
           sizeof(char) * args.joinArgs.output_ts->getEntrySize());
-      for (const auto &attr1 : args.joinArgs.output_ts->getAttributeList()) {
-        bool hit = false;
+      for (const auto &output_table_attr :
+           args.joinArgs.output_ts->getAttributeList()) {
+        bool hit_attr = false;
         // if the attribute is the selected attribute then copy the value
 
         // the output tuple
-        for (const auto &attr2 : probe_table_ts->getAttributeList()) {
-          if (attr1.name == attr2.name) {
-            hit = true;
-            memcpy((char *)output_tuple + attr1.offset,
-                   (char *)probe_input_tuple + attr2.offset, attr1.size);
+        for (const auto &probe_table_attr :
+             probe_table_ts->getAttributeList()) {
+          if (output_table_attr.name == probe_table_attr.name) {
+            hit_attr = true;
+            memcpy((char *)output_tuple + output_table_attr.offset,
+                   (char *)probe_input_tuple + probe_table_attr.offset,
+                   output_table_attr.size);
+            break;
           }
         }
 
-        if (hit == false) {
-          for (const auto &attr2 : buildTableEntry->getAttributes()) {
-            if (attr1.name == attr2.name) {
-              hit = true;
-              memcpy((char *)output_tuple + attr1.offset,
-                     (char *)hit_tuple + attr2.offset, attr1.size);
-            }
+        if (hit_attr) {
+          continue;
+        }
+        for (const auto &build_table_attr : buildTableEntry->getAttributes()) {
+          if (output_table_attr.name == build_table_attr.name) {
+            memcpy((char *)output_tuple + output_table_attr.offset,
+                   (char *)hit_tuple + build_table_attr.offset,
+                   output_table_attr.size);
+            break;
           }
         }
       }
+
+      // print ouput tuple
+      // std::cout << "---Output Tuple---\n";
+      // for (const auto &attr : args.joinArgs.output_ts->getAttributeList()) {
+      //   std::cout << "Attribute: " << attr.name << " Value: ";
+      //   if (attr.type == INTEGER) {
+      //     if (attr.name == "Column_1_Table_A") {
+      //       if (*((int *)((char *)output_tuple + attr.offset)) > 265000000) {
+      //         std::cout << *((int *)((char *)output_tuple + attr.offset))
+      //                   << "\n";
+      //       }
+      //     }
+      //     std::cout << *((int *)((char *)output_tuple + attr.offset)) <<
+      //     "\n";
+
+      //   } else if (attr.type == STRING) {
+      //     std::cout << ((char *)output_tuple + attr.offset) << "\n";
+      //   }
+      // }
+      // std::cout << "------------------\n";
+      // std::cout << "---Close---\n";
+
       args.joinArgs.output_ts->insert(output_tuple);
+      // print the output tuple stream
+      // std::cout << "---Output Tuple---\n";
+      // args.joinArgs.output_ts->printStream();
+      // std::cout << "------------------\n";
     }
   }
   return true;
@@ -239,10 +297,8 @@ void *linearSearch(LoopFnArgs args, void *probe_input_tuple,
                    ReadTupleStream *build_table_input_ts) {
 
   StaticVars staticVar;
-  RelationCatalog RELCAT;
-  RelationCatalogEntry *buildTableEntry = new RelationCatalogEntry();
-  int ret =
-      RELCAT.getTableEntry(*(args.joinArgs.buildTableName), buildTableEntry);
+  RelationCatalogEntry *buildTableEntry =
+      RelationCatalog::getTableEntryRef(*(args.joinArgs.buildTableName));
 
   while (true) {
     void *build_input_tuple = build_table_input_ts->yieldNext();

@@ -44,15 +44,7 @@ public:
   static void deleteRelcat();
 
   static int appendToThreadMapMorsel(const std::string &tableName, int core,
-                                     void *morselEntry) {
-
-    for (auto iter = catList.begin(); iter != catList.end(); iter++) {
-      if (tableName == iter->getTableName()) {
-        iter->threadMap[core]->insertEntry(morselEntry);
-      }
-    }
-    return 0;
-  }
+                                     void *morselEntry);
 };
 
 // Global variable referencing the relcat object

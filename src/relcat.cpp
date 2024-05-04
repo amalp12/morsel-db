@@ -146,9 +146,20 @@ int RelationCatalog::getTableEntry(const std::string &tableName,
 
 void RelationCatalogEntry::clearEntry() {
   tableName.clear();
+  // decalre static vars and get number of cores
+  StaticVars staticVars;
+  int numCores = staticVars.getNumberOfCores();
   // for each entry in attirbuteList
   for (auto &attr : attributeList) {
     attr.name.clear();
+    if (attr.bPlusTreeContainer) {
+      // for each core in bPlusTreeContainer
+      for (int i = 1; i <= numCores; i++) {
+        // delete the bPlusTreeContainer
+        auto treeRef = attr.bPlusTreeContainer->getTreeRef(i);
+        // TODO : call bPlusTreeContainer destructor
+      }
+    }
   }
   // clear attibute list
   attributeList.clear();
@@ -199,5 +210,16 @@ int relcatInit() {
 
   RelationCatalog RELCAT;
   RELCAT.insertNewTable("_relcat", colNameList, colTypeList);
+  return 0;
+}
+
+int RelationCatalog::appendToThreadMapMorsel(const std::string &tableName,
+                                             int core, void *morselEntry) {
+
+  for (auto iter = catList.begin(); iter != catList.end(); iter++) {
+    if (tableName == iter->getTableName()) {
+      iter->threadMap[core]->insertEntry(morselEntry);
+    }
+  }
   return 0;
 }

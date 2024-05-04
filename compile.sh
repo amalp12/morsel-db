@@ -9,7 +9,7 @@ LLVM_REPO=../mlir-hello/thirdparty/llvm-project
 BUILD_DIR=$LLVM_REPO/build
 INSTALL_DIR=$LLVM_REPO/install
 CCACHE_PREFIX=distcc
-
+ROOTDIR=.
 set -e
 
 

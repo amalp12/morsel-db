@@ -225,7 +225,7 @@ template <typename T> void *BPlusTree<T>::search(T attrVal, int op) {
   BPlusTree_InternalUnit<T> *internalUnit;
 
   // while the node is not a leaf node
-  while (nodePtr->getNodeType() == INTERNAL_NODE) {
+  while (nodePtr->getNodeType() != LEAF_NODE) {
     // typecast the node to internal node
     BPlusTree_InternalNode<T> *internalNode =
         (BPlusTree_InternalNode<T> *)nodePtr;
@@ -257,7 +257,8 @@ template <typename T> void *BPlusTree<T>::search(T attrVal, int op) {
       //        Hint: the helper function compareAttrs() can be used for
       //        comparing
 
-      int index = 0, numberOfUnits = internalNode->getNumberOfFilledUnits();
+      int index = 0;
+      const int numberOfUnits = internalNode->getNumberOfFilledUnits();
       while (index < numberOfUnits) {
 
         // TODO : Implement Compare Attrs
@@ -294,28 +295,12 @@ template <typename T> void *BPlusTree<T>::search(T attrVal, int op) {
   BPlusTree_LeafNode<T> *leafNode = (BPlusTree_LeafNode<T> *)nodePtr;
 
   while (leafNode) {
-    int numberOfUnits = leafNode->getNumberOfFilledUnits();
+    const int numberOfUnits = leafNode->getNumberOfFilledUnits();
     for (int index = 0; index < numberOfUnits; index++) {
 
       // TODO : Implement compareAttrs
       int cmpVal = compareAttrs(leafNode->units[index].key, attrVal);
 
-      // calculate cmpVal fro integer and string
-      // switch (this->attribute->type) {
-
-      // case INTEGER: {
-      //   cmpVal = attrVal - leafNode->units[index].key;
-      //   break;
-      // }
-
-      // case STRING: {
-      //   // typcast `t *` to `std::string`
-      //   std::string stringVal = (std::string)attrVal;
-
-      //   cmpVal = stringVal.compare(leafNode->units[index].key);
-      //   break;
-      // }
-      // }
       if ((op == EQUAL && cmpVal == 0) ||
           (op == LESS_THAN_OR_EQUAL && cmpVal <= 0) ||
           (op == LESS_THAN && cmpVal < 0) ||
@@ -332,15 +317,14 @@ template <typename T> void *BPlusTree<T>::search(T attrVal, int op) {
             are arranged in ascending order in the leaves */
         return nullptr;
       }
-
-      /*only for NE operation do we have to check the entire linked list;
-          for all the other op it is guaranteed that the block being searched
-          will have an entry, if it exists, satisying that op. */
-      if (op != NOT_EQUAL) {
-        break;
-      }
-      // block = next block in the linked list, i.e., the rblock in leafHead.
     }
+    /*only for NE operation do we have to check the entire linked list;
+        for all the other op it is guaranteed that the block being searched
+        will have an entry, if it exists, satisying that op. */
+    if (op != NOT_EQUAL) {
+      break;
+    }
+    // block = next block in the linked list, i.e., the rblock in leafHead.
     leafNode = leafNode->next;
   }
 

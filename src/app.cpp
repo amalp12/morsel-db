@@ -13,19 +13,30 @@
 
 void initializeJoinHash(const hsql::SelectStatement *selectStatement,
                         std::string table1, std::string table2) {
+
+  // if always linear search return
+  if (true) {
+    return;
+  }
   // get relcat
-  RelationCatalog relcat;
 
   // get table1
   // probe table is the smaller table and build table is the larger table
 
   // get the table entry for table1
-  RelationCatalogEntry *probeTableEntry = relcat.getTableEntryRef(table1);
+  RelationCatalogEntry *probeTableEntry =
+      RelationCatalog::getTableEntryRef(table1);
   // get the table entry for table2
-  RelationCatalogEntry *buildTableEntry = relcat.getTableEntryRef(table2);
+  RelationCatalogEntry *buildTableEntry =
+      RelationCatalog::getTableEntryRef(table2);
 
+  std::string joinStatementAttributeLeft =
+      selectStatement->fromTable->join->condition->expr->name;
+  std::string joinStatementAttributeRight =
+      selectStatement->fromTable->join->condition->expr2->name;
   if (probeTableEntry->num_records > buildTableEntry->num_records) {
     std::swap(probeTableEntry, buildTableEntry);
+    std::swap(joinStatementAttributeLeft, joinStatementAttributeRight);
   }
 
   // get the name of the attributes in the build table that is supposed to be
@@ -34,15 +45,14 @@ void initializeJoinHash(const hsql::SelectStatement *selectStatement,
   // std::vector<std::string> buildTableIndexAttributes;
   // get the list of column names of the build table that is used in the join
   // statement
-  std::string joinStatementAttribute =
-      selectStatement->fromTable->join->condition->expr->name;
+
   // copy attr list of builtable to a list
   std::list<Attribute> *buildTableAttrList =
       buildTableEntry->getAttributesRef();
   for (auto &attr : *buildTableAttrList) {
     // get attributes in the join statement
 
-    if (joinStatementAttribute == attr.name) {
+    if (attr.name == joinStatementAttributeRight) {
       // buildTableIndexAttributes.push_back(attr.name);
       // create index on the attribute
       if (!attr.isIndexed) {
@@ -61,7 +71,7 @@ int main(int argc, char **argv) {
   // create staticVars
   StaticVars staticVars;
   // set cores and morsel size
-  staticVars.setNumberOfCores(1);
+  staticVars.setNumberOfCores(2);
 
   staticVars.setMaxMorselSize(264000);
   // create_table_test();

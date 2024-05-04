@@ -86,13 +86,10 @@ int QEP::handleNameSelect(int coreNum,
                        : NULL;
   // start_time = std::chrono::high_resolution_clock::now();
   // get relationcat entry
-  RelationCatalogEntry *entry = new RelationCatalogEntry();
-
-  RelationCatalog RELCAT;
-  int ret = RELCAT.getTableEntry(tableName, entry);
+  RelationCatalogEntry *entry = RelationCatalog::getTableEntryRef(tableName);
 
   // if the table is not found
-  if (ret != 0) {
+  if (not entry) {
     std::cout << "Table not found\n";
     return FAILURE;
   }
@@ -135,12 +132,6 @@ int QEP::handleNameSelect(int coreNum,
     // std::cout << "RHS: " << rhs->ival << std::endl;
     // std::cout << "OP: " << op << std::endl;
 
-    // if the table is not found
-    if (ret != 0) {
-      std::cout << "\n";
-      return -1;
-    }
-
     // get entire table column attributes
     const auto columnslist = entry->getAttributes();
 
@@ -159,8 +150,8 @@ int QEP::handleNameSelect(int coreNum,
     relCat.insertNewTable(tempTableName, selectedColNameList,
                           selectedColTypeList);
 
-    RelationCatalogEntry *newEntry = new RelationCatalogEntry();
-    ret = RELCAT.getTableEntry(tempTableName, newEntry);
+    RelationCatalogEntry *newEntry =
+        RelationCatalog::getTableEntryRef(tempTableName);
 
     // call seleect fn loop
     union LoopFnArgs args;
@@ -187,7 +178,7 @@ int QEP::handleNameSelect(int coreNum,
     // print the output tuple stream for debugging
     // args.selectArgs.output_ts->printStream();
 
-    std::string output_file_name = get_env_var("ROOTDIR") + "/out/output_" +
+    std::string output_file_name = "/home/ssl/Code/db/out/output_" +
                                    entry->getTableName() + "_" +
                                    std::to_string(coreNum) + ".txt";
     // args.selectArgs.output_ts->writeStream(output_file_name);
@@ -327,7 +318,10 @@ int QEP::handleJoin(int coreNum, const hsql::SelectStatement *selectStatement) {
   union LoopFnArgs args;
 
   args.joinArgs.probe_ts = new ReadTupleStream(probeTableEntry, coreNum);
+  ReadTupleStream *build_ts = new ReadTupleStream(buildTableEntry, coreNum);
 
+  // args.joinArgs.probe_ts->printStream();
+  // build_ts->printStream();
   args.joinArgs.output_ts = new WriteTupleStream(newEntry, coreNum);
 
   args.joinArgs.probeTableAttr = probeAttr;
@@ -360,14 +354,15 @@ int QEP::handleJoin(int coreNum, const hsql::SelectStatement *selectStatement) {
   }
 
   default: {
+    std::cout << "Invalid operator type\n";
+    exit(1);
     break;
   }
   }
 
   Operator::loop(fn_join_loop, args, JOIN_FN_IDENTIFIER);
 
-  std::string output_file_name = get_env_var("ROOTDIR") +
-                                 "/out/temp_join_result_" +
+  std::string output_file_name = "/home/ssl/Code/db/out/temp_join_result_" +
                                  std::to_string(coreNum) + ".csv";
 
   args.joinArgs.output_ts->writeStream(output_file_name);
@@ -414,12 +409,10 @@ int QEP::handleInsert(int coreNum) {
 
   // start_time = std::chrono::high_resolution_clock::now();
 
-  RelationCatalogEntry *entry = new RelationCatalogEntry();
-
-  int ret = relCat.getTableEntry(tableName, entry);
+  RelationCatalogEntry *entry = RelationCatalog::getTableEntryRef(tableName);
 
   // Check if the table is not found
-  if (ret != 0) {
+  if (not entry) {
     std::cout << "Table not found (insert)\n";
     delete entry; // Clean up allocated memory
     return -1;
