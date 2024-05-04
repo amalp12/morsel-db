@@ -51,8 +51,9 @@ bool fn_select_loop(LoopFnArgs args) {
     // output tuple
     for (const auto input_attr : input_ts->getAttributeList()) {
       if (input_attr.name == output_attr.name) {
-        memcpy((char *)output_tuple + output_attr.offset,
-               (char *)input_tuple + input_attr.offset, input_attr.size);
+        memcpy((void *)((char *)output_tuple + output_attr.offset),
+               (void *)((char *)input_tuple + input_attr.offset),
+               input_attr.size);
         break;
       }
     }
@@ -111,8 +112,8 @@ bool fn_join_loop(LoopFnArgs args) {
           for (const auto &probe_attr : probe_table_ts->getAttributeList()) {
             if (probe_attr.name == output_attr.name) {
               hit = true;
-              memcpy((char *)output_tuple + output_attr.offset,
-                     (char *)probe_input_tuple + probe_attr.offset,
+              memcpy((void *)((char *)output_tuple + output_attr.offset),
+                     (void *)((char *)probe_input_tuple + probe_attr.offset),
                      probe_attr.size);
             }
           }
@@ -122,8 +123,8 @@ bool fn_join_loop(LoopFnArgs args) {
                  build_table_input_ts->getAttributeList()) {
               if (build_attr.name == output_attr.name) {
                 hit = true;
-                memcpy((char *)output_tuple + output_attr.offset,
-                       (char *)build_input_tuple + build_attr.offset,
+                memcpy((void *)((char *)output_tuple + output_attr.offset),
+                       (void *)((char *)build_input_tuple + build_attr.offset),
                        build_attr.size);
               }
             }
@@ -179,8 +180,7 @@ bool fn_join_loop(LoopFnArgs args) {
       Tuple tup;
       int *probe_input_tuple_val = (int *)tup.getTupleValue(
           args.joinArgs.probeTableAttr, probe_input_tuple);
-      hit_tuple =
-          bPlusTreeInt->search(((int *)probe_input_tuple), args.joinArgs.op);
+      hit_tuple = bPlusTreeInt->search(probe_input_tuple_val, args.joinArgs.op);
       break;
     }
 
@@ -190,8 +190,8 @@ bool fn_join_loop(LoopFnArgs args) {
       char *probe_input_tuple_val = (char *)tup.getTupleValue(
           args.joinArgs.probeTableAttr, probe_input_tuple);
 
-      hit_tuple = bPlusTreeString->search((char *)(probe_input_tuple_val),
-                                          args.joinArgs.op);
+      hit_tuple =
+          bPlusTreeString->search(probe_input_tuple_val, args.joinArgs.op);
       break;
     }
     default: {
@@ -231,7 +231,7 @@ bool fn_join_loop(LoopFnArgs args) {
       // std::cout << "------------------\n";
 
       void *output_tuple = (void *)malloc(
-          sizeof(char) * args.joinArgs.output_ts->getEntrySize());
+          (sizeof(char) * (args.joinArgs.output_ts->getEntrySize())));
       for (const auto &output_table_attr :
            args.joinArgs.output_ts->getAttributeList()) {
         bool hit_attr = false;
@@ -242,9 +242,10 @@ bool fn_join_loop(LoopFnArgs args) {
              probe_table_ts->getAttributeList()) {
           if (output_table_attr.name == probe_table_attr.name) {
             hit_attr = true;
-            memcpy((char *)output_tuple + output_table_attr.offset,
-                   (char *)probe_input_tuple + probe_table_attr.offset,
-                   output_table_attr.size);
+            memcpy(
+                (void *)((char *)output_tuple + output_table_attr.offset),
+                (void *)((char *)probe_input_tuple + probe_table_attr.offset),
+                output_table_attr.size);
             break;
           }
         }
@@ -254,8 +255,8 @@ bool fn_join_loop(LoopFnArgs args) {
         }
         for (const auto &build_table_attr : buildTableEntry->getAttributes()) {
           if (output_table_attr.name == build_table_attr.name) {
-            memcpy((char *)output_tuple + output_table_attr.offset,
-                   (char *)hit_tuple + build_table_attr.offset,
+            memcpy((void *)((char *)output_tuple + output_table_attr.offset),
+                   (void *)((char *)hit_tuple + build_table_attr.offset),
                    output_table_attr.size);
             break;
           }

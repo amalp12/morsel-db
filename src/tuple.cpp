@@ -44,7 +44,7 @@ void TupleStream::printStream() {
   Morsel *morselPtr = morsel;
 
   // get the attribute list
-  std::list<Attribute> attributeList = getAttributeList();
+  const std::list<Attribute> attributeList = getAttributeList();
   // get entry size
   // int entrySize = 0;
   for (auto iter = attributeList.begin(); iter != attributeList.end(); iter++) {
@@ -72,7 +72,8 @@ void TupleStream::printStream() {
       void *entry = morselPtr->getNthMorselEntry(entryNo);
       for (auto iter = attributeList.begin(); iter != attributeList.end();
            iter++) {
-        void *value = tup.getTupleValue(&(*iter), entry);
+        auto iterVal = *iter;
+        void *value = tup.getTupleValue(&iterVal, entry);
         if (iter->type == INTEGER) {
           std::cout << *(int *)value << " ";
         } else if (iter->type == FLOAT) {

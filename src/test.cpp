@@ -228,12 +228,12 @@ void initMorselRandom(int core, std::string tableName, int start_index,
 
       // check type of column
       if (column.type == STRING) {
-        memcpy(destination + column.offset, cell.c_str(), cell.size() + 1);
+        memcpy((destination + column.offset), cell.c_str(), cell.size() + 1);
       }
 
       if (column.type == INTEGER) {
         integerAttr = std::stoi(cell);
-        memcpy(destination + column.offset, &integerAttr, column.size);
+        memcpy((destination + column.offset), &integerAttr, column.size);
       }
     }
 

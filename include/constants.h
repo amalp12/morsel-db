@@ -5,7 +5,7 @@
 #pragma once
 // flags
 enum FLAGS {
-  ALWAYS_LINEAR_SEARCH = true,
+  ALWAYS_LINEAR_SEARCH = false,
 };
 
 // b plus tree max key size

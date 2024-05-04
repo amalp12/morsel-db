@@ -364,6 +364,8 @@ int QEP::handleJoin(int coreNum, const hsql::SelectStatement *selectStatement) {
   std::string output_file_name = "/home/ssl/Code/db/out/temp_join_result_" +
                                  std::to_string(coreNum) + ".csv";
 
+  // reset the output tuple stream
+  args.joinArgs.output_ts->resetStream();
   args.joinArgs.output_ts->writeStream(output_file_name);
   // args.joinArgs.output_ts->printStream();
 
