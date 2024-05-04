@@ -20,8 +20,8 @@ void initializeJoinHash(const hsql::SelectStatement *selectStatement,
   }
   // get relcat
 
-  // get table1
-  // probe table is the smaller table and build table is the larger table
+//   // get table1
+//   // probe table is the smaller table and build table is the larger table
 
   // get the table entry for table1
   RelationCatalogEntry *probeTableEntry =
@@ -39,8 +39,8 @@ void initializeJoinHash(const hsql::SelectStatement *selectStatement,
     std::swap(joinStatementAttributeLeft, joinStatementAttributeRight);
   }
 
-  // get the name of the attributes in the build table that is supposed to be
-  // indexed usig b+ tree
+//   // get the name of the attributes in the build table that is supposed to be
+//   // indexed usig b+ tree
 
   // std::vector<std::string> buildTableIndexAttributes;
   // get the list of column names of the build table that is used in the join
@@ -71,16 +71,19 @@ int main(int argc, char **argv) {
   // create staticVars
   StaticVars staticVars;
   // set cores and morsel size
+  // staticVars.setNumberOfCores(std::stoi(get_env_var("NUM_OF_CORES")));
   staticVars.setNumberOfCores(4);
 
-  staticVars.setMaxMorselSize(264000);
+
+  // staticVars.setMaxMorselSize(std::stoi(get_env_var("MORSEL_SIZE")));
+  staticVars.setMaxMorselSize(10000);
   // create_table_test();
   while (true) {
     // create_table_test();
-    std::string table1 = "Table_A";
-    std::string table2 = "Table_B";
+    std::string table1 = "test_table";
+    // std::string table2 = "Table_B";
     create_table_test_random(table1);
-    create_table_test_random(table2);
+    // create_table_test_random(table2);
     try {
 
       std::cout << "Enter your query: " << std::endl;
@@ -91,8 +94,8 @@ int main(int argc, char **argv) {
 
       // SELECT Name, ID, Age from test_table WHERE Age > 0;
       std::string query;
-      std::getline(std::cin, query);
-
+      // std::getline(std::cin, query);
+      query = get_env_var("QUERY");
       // Exit loop if the user enters 'exit' or 'quit'
       if (query == "exit" || query == "quit") {
         std::cout << "Exiting...\n";
@@ -116,7 +119,7 @@ int main(int argc, char **argv) {
           // check if join
           if (selectStatement->fromTable->type == hsql::kTableJoin) {
             // initialize join hash
-            initializeJoinHash(selectStatement, table1, table2);
+            // initializeJoinHash(selectStatement, table1, table2);
           }
         }
         // call execute on the qep object
@@ -154,6 +157,7 @@ int main(int argc, char **argv) {
       std::cerr << "An error occurred.\n";
     }
     destructRelcat();
+    break;
   }
 
   return 0;

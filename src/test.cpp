@@ -123,11 +123,10 @@ int create_table_test_random(std::string tableName) {
   std::list<int> colTypeList;
 
   // generate the number of columns
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_int_distribution<int> dist(3, 7);
-  int numColumns = dist(gen);
-
+  // std::random_device rd;
+  // std::mt19937 gen(rd());
+  // std::uniform_int_distribution<int> dist(3, 7);
+  int numColumns = std::stoi(get_env_var("NUM_OF_COLS_test_table"));
   RelationCatalog relCat;
 
   for (int col = 0; col < numColumns; ++col) {

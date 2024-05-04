@@ -20,7 +20,7 @@ static void test(int argc, char **argv) {
   std::string query = "select Column_1 from test_table where Column_1 > 0;";
   hsql::SQLParserResult result;
   hsql::SQLParser::parse(query, &result);
-  auto table_size = get_env_var("TEST_TABLE_SIZE");
+  auto table_size = std::stoi(get_env_var("TEST_TABLE_SIZE"));
   if (result.isValid() && result.size() > 0) {
     const hsql::SQLStatement *statement = result.getStatement(0);
     // parseSelectStatement(statement);
