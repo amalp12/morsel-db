@@ -48,16 +48,14 @@ for ((cols = 3; cols <= 20; cols += 2)); do
         echo >> "$file1"
     done
     
+    ./compile.sh
     for ((no_of_cores = 2; no_of_cores <= 48; no_of_cores += 2)); do
         export NUM_OF_CORES=$no_of_cores
         for ((morselSize = row_size; morselSize <= row_size * 8000; morselSize += row_size * 200)); do
             export MORSEL_SIZE=$morselSize
-            ./compile.sh
             ./build/src/dbapp
-            TimeTaken=$?
-            num_rec_per_morsel=$(( morselSize / row_size ))
-            echo "$no_of_cores,$num_rec_per_morsel,$cols,$row_size,$TimeTaken" >> "$outputCSV"
         done
+        echo "/-------------------------------------CORE $no_of_cores COMPLETE -------------------------------------------/"
     done
 done
 

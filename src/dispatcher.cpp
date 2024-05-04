@@ -455,8 +455,8 @@ int QEP::handleInsert(int coreNum) {
 
 int QEP::execute(int coreNum) {
   // Get the current time before running the program
-  // auto start_time = std::chrono::high_resolution_clock::now();
-  std::chrono::time_point<std::chrono::high_resolution_clock> start_time;
+  auto start_time = std::chrono::high_resolution_clock::now();
+  // std::chrono::time_point<std::chrono::high_resolution_clock> start_time;
   // declare start time type
 
   int retval = FAILURE;
