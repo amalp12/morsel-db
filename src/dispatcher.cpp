@@ -181,16 +181,15 @@ int QEP::handleNameSelect(int coreNum,
     std::string output_file_name = "/home/ssl/Code/db/out/output_" +
                                    entry->getTableName() + "_" +
                                    std::to_string(coreNum) + ".txt";
-    // args.selectArgs.output_ts->writeStream(output_file_name);
+    args.selectArgs.output_ts->writeStream(output_file_name);
 
     // peda gdb
 
-    delete entry;
-    delete newEntry;
     // delete input_ts and output_ts
     delete args.selectArgs.input_ts;
     delete args.selectArgs.output_ts;
   }
+
   // std::cout << "Exiting Select ... " <<std::endl;
   return SUCCESS;
 }

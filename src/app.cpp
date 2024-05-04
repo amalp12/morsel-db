@@ -15,7 +15,7 @@ void initializeJoinHash(const hsql::SelectStatement *selectStatement,
                         std::string table1, std::string table2) {
 
   // if always linear search return
-  if (true) {
+  if (ALWAYS_LINEAR_SEARCH) {
     return;
   }
   // get relcat
@@ -71,7 +71,7 @@ int main(int argc, char **argv) {
   // create staticVars
   StaticVars staticVars;
   // set cores and morsel size
-  staticVars.setNumberOfCores(2);
+  staticVars.setNumberOfCores(4);
 
   staticVars.setMaxMorselSize(264000);
   // create_table_test();
