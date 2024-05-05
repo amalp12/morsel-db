@@ -57,10 +57,12 @@ int main(int argc, char **argv) {
         std::string table = "test_table";
         std::string table1 = "Table_A";
         std::string table2 = "Table_B";
-        create_table_test_random(table);
+        create_table_test_random(table1);
+        create_table_test_random(table2);
+        // create_table_test_random(table);
 
         try {
-            const std::string outputCSV = "./outputlog_select.csv";
+            const std::string outputCSV = "./outputlog_join.csv";
             std::ofstream output(outputCSV.c_str(), std::ios_base::app);
 
             std::string query = get_env_var("QUERY");
@@ -107,14 +109,17 @@ int main(int argc, char **argv) {
                     res = qep.execute(1); // Assuming coreNum is not used elsewhere
                 }
 
-                int cols = std::stoi(get_env_var("NUM_OF_COLS_" + table));
-                
+                int cols1 = std::stoi(get_env_var("NUM_OF_COLS_" + table1));
+                int cols2 = std::stoi(get_env_var("NUM_OF_COLS_" + table2));
                 
 
                 output << staticVars.getNumberOfCores() 
-                << "," << std::stoi(get_env_var("MORSEL_SIZE_" + table)) 
-                << "," << std::stoi(get_env_var("NUM_OF_COLS_" + table)) 
-                << "," << std::stoi(get_env_var("row_size"))
+                << "," << std::stoi(get_env_var("MORSEL_SIZE_" + table1)) 
+                << "," << std::stoi(get_env_var("MORSEL_SIZE_" + table2)) 
+                << "," << std::stoi(get_env_var("NUM_OF_COLS_" + table1)) 
+                << "," << std::stoi(get_env_var("NUM_OF_COLS_" + table2)) 
+                << "," << std::stoi(get_env_var("row_size_A"))
+                << "," << std::stoi(get_env_var("row_size_B"))
                 << "," << std::fixed << std::setprecision(5) << res << std::endl;
                 }
 

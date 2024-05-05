@@ -81,7 +81,7 @@ int RelationCatalog::insertNewTable(const std::string &name,
   // fill the object
   entry->setTableName(name);
   entry->setAttributes(attrs);
-
+  entry->maxMorselSize = std::stoi(get_env_var("MORSEL_SIZE_" + name));
   int entrySize = 0;
   for (auto iter = attrs.begin(); iter != attrs.end(); iter++) {
     entrySize += iter->size;
@@ -89,7 +89,7 @@ int RelationCatalog::insertNewTable(const std::string &name,
 
   for (int coreNum = 1; coreNum <= staticVars.getNumberOfCores(); coreNum++) {
     entry->threadMap[coreNum] =
-        new Morsel(staticVars.getMaxMorselSize(), entrySize);
+        new Morsel(entry->maxMorselSize, entrySize);
   }
 
   // append to catList
@@ -110,6 +110,7 @@ int RelationCatalog::insertNewTable(const std::string &name,
   // fill the object
   entry->setTableName(name);
   entry->setAttributes(colNameList, colTypeList);
+  entry->maxMorselSize = std::stoi(get_env_var("MORSEL_SIZE_" + name));
 
   std::list<Attribute> attributeList = entry->getAttributes();
   int entrySize = 0;
@@ -119,7 +120,7 @@ int RelationCatalog::insertNewTable(const std::string &name,
 
   for (int coreNum = 1; coreNum <= staticVars.getNumberOfCores(); coreNum++) {
     entry->threadMap[coreNum] =
-        new Morsel(staticVars.getMaxMorselSize(), entrySize);
+        new Morsel(entry->maxMorselSize, entrySize);
   }
 
   // append to catList

@@ -6,6 +6,7 @@
 #include <constants.h>
 #include <list>
 #include <map>
+#include "test.h"
 
 class RelationCatalogEntry {
 private:
@@ -15,6 +16,7 @@ private:
 
 public:
   int num_records;
+  int maxMorselSize;
   std::map<int, Morsel *> threadMap;
   RelationCatalogEntry();
   std::string getTableName();

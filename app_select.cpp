@@ -55,8 +55,6 @@ int main(int argc, char **argv) {
 
     while (true) {
         std::string table = "test_table";
-        std::string table1 = "Table_A";
-        std::string table2 = "Table_B";
         create_table_test_random(table);
 
         try {

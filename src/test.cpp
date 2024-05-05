@@ -126,7 +126,7 @@ int create_table_test_random(std::string tableName) {
   // std::random_device rd;
   // std::mt19937 gen(rd());
   // std::uniform_int_distribution<int> dist(3, 7);
-  int numColumns = std::stoi(get_env_var("NUM_OF_COLS_test_table"));
+  int numColumns = std::stoi(get_env_var("NUM_OF_COLS_" + tableName));
   RelationCatalog relCat;
 
   for (int col = 0; col < numColumns; ++col) {
@@ -249,9 +249,9 @@ int insertRowsRandom(std::list<int> colTypeList, std::string tableName) {
   std::ofstream outFile(filename, std::ios_base::out);
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<int> distribution(10000, 100000);
+  // std::uniform_int_distribution<int> distribution(10000, 100000);
 
-  int num_rows = distribution(gen);
+  int num_rows = std::stoi(get_env_var("NUM_OF_RECS_" + tableName));
 
   for (int i = 0; i < num_rows; i++) {
     int col = 0;

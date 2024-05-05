@@ -146,7 +146,7 @@ int QEP::handleNameSelect(int coreNum,
     RelationCatalog relCat;
     // SELECT ID,Name,Age FROM test_table WHERE Age > 0;
 
-    std::string tempTableName = "_" + entry->getTableName();
+    std::string tempTableName =  entry->getTableName() + "_temp";
     relCat.insertNewTable(tempTableName, selectedColNameList,
                           selectedColTypeList);
 
@@ -178,7 +178,7 @@ int QEP::handleNameSelect(int coreNum,
     // print the output tuple stream for debugging
     // args.selectArgs.output_ts->printStream();
 
-    std::string output_file_name = "/home/ssl/Code/db/out/output_" +
+    std::string output_file_name = get_env_var("ROOTDIR") + "/out/output_" +
                                    entry->getTableName() + "_" +
                                    std::to_string(coreNum) + ".txt";
     args.selectArgs.output_ts->writeStream(output_file_name);
@@ -361,7 +361,7 @@ int QEP::handleJoin(int coreNum, const hsql::SelectStatement *selectStatement) {
 
   Operator::loop(fn_join_loop, args, JOIN_FN_IDENTIFIER);
 
-  std::string output_file_name = "/home/ssl/Code/db/out/temp_join_result_" +
+  std::string output_file_name = get_env_var("ROOTDIR") + "/out/temp_join_result_" +
                                  std::to_string(coreNum) + ".csv";
 
   // reset the output tuple stream
