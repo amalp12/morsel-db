@@ -12,7 +12,7 @@ elseif(CMAKE_BUILD_TYPE MATCHES "Release")
     target_link_libraries(morsel_test /usr/local/lib/libsqlparser_release.so )
     # target_link_libraries(your_target_name optimized release_library_name)
 endif()
-target_link_libraries(morsel_test srclib )
+target_link_libraries(morsel_test srclib numa)
 
 # Add the morsel_test to CTest
 add_test(NAME MorselTest COMMAND morsel_test)

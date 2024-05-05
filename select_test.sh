@@ -48,13 +48,15 @@ for ((cols = 3; cols <= 20; cols += 2)); do
         echo >> "$file1"
     done
     
-    ./compile.sh
+    # ./compile_release.sh
+    ./compile_release.sh
     for ((no_of_cores = 2; no_of_cores <= 48; no_of_cores += 2)); do
         export NUM_OF_CORES=$no_of_cores
         for ((morselSize = row_size; morselSize <= row_size * 8000; morselSize += row_size * 200)); do
             export MORSEL_SIZE_test_table=$morselSize
             export MORSEL_SIZE_test_table_temp=$morselSize
-            ./build/src/dbapp
+            # ./build-release/src/dbapp
+            ./build-release/src/dbapp
         done
         echo "/-------------------------------------CORE $no_of_cores COMPLETE -------------------------------------------/"
     done

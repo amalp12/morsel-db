@@ -12,6 +12,7 @@
 #include <thread>
 #include <fstream>
 #include <iomanip>
+#include <numa.h>
 
 void initializeJoinHash(const hsql::SelectStatement *selectStatement,
                         std::string table1, std::string table2) {
@@ -42,6 +43,13 @@ void initializeJoinHash(const hsql::SelectStatement *selectStatement,
 
 int main(int argc, char **argv) {
     StaticVars staticVars;
+    
+    // initialize numa
+    if (numa_available() < 0 ) {
+        std:: cout << "Numa not available!";
+        exit(0);
+    }
+    staticVars.setNumaNodes(numa_max_node()+1);
     // staticVars.setMaxMorselSize(std::stoi(get_env_var("MORSEL_SIZE")));
     staticVars.setNumberOfCores(std::stoi(get_env_var("NUM_OF_CORES")));
 

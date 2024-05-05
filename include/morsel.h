@@ -13,6 +13,7 @@ private:
   void *startPtr;
   int nextFreeIndex;
   int filledEntries;
+  int numaNode;
   int setNthMorselEntry(int n, void *ptr);
   int setNthMorselEntry(int n, void *ptr, std::list<Attribute> attributeList);
   int setNext(Morsel *nextPtr);

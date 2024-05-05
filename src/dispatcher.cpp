@@ -1,8 +1,10 @@
 #include "dispatcher.h"
 #include "loop_functions.h"
 #include "relcat.h"
+#include "static.h"
 #include "test.h"
 #include <chrono>
+#include <numa.h>
 
 const hsql::SQLStatement *QEP::statement;
 std::map<hsql::Expr *, std::array<int, 48>> QEP::dependencyMap;
@@ -455,6 +457,14 @@ int QEP::handleInsert(int coreNum) {
 
 int QEP::execute(int coreNum) {
   // Get the current time before running the program
+  StaticVars st;
+  int currNode = st.getNumaID(coreNum -1);
+  if (coreNum > 1 &&  currNode >= 0 ) {
+    if (numa_run_on_node(currNode) < 0) {
+      fprintf(stderr, "Error message: %s\n", strerror(errno));
+      std::cout << "Not possible" << '\n';
+    }
+  }
   auto start_time = std::chrono::high_resolution_clock::now();
   // std::chrono::time_point<std::chrono::high_resolution_clock> start_time;
   // declare start time type

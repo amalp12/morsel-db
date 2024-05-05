@@ -18,6 +18,8 @@ public:
   int num_records;
   int maxMorselSize;
   std::map<int, Morsel *> threadMap;
+  std::map<size_t, Morsel *> numaNodeMap;
+
   RelationCatalogEntry();
   std::string getTableName();
   std::list<Attribute> getAttributes();

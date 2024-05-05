@@ -1,5 +1,5 @@
 #include "relcat.h"
-#include "static.h"
+#include "static.h";
 
 std::list<RelationCatalogEntry> RelationCatalog::catList;
 
@@ -118,6 +118,7 @@ int RelationCatalog::insertNewTable(const std::string &name,
     entrySize += iter->size;
   }
 
+// alternate numa node id 
   for (int coreNum = 1; coreNum <= staticVars.getNumberOfCores(); coreNum++) {
     entry->threadMap[coreNum] =
         new Morsel(entry->maxMorselSize, entrySize);
