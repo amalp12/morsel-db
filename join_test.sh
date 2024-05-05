@@ -28,8 +28,8 @@ fi
 # Create CSV header
 echo "NUM_OF_CORE,MORSEL_SIZE_A,MORSEL_SIZE_B,colsA,colsB,recSizeA,recSizeB,TimeTaken" >> "$outputCSV"
 
-for ((col1 = 3; col1 <= 20; col1 += 2)); do
-    for ((col2 = 3; col2 <= 20; col2 += 2)); do
+for ((col1 = 3; col1 <= 10; col1 += 2)); do
+    for ((col2 = 3; col2 <= 10; col2 += 2)); do
         rm "$file1" # Remove CSV file if it exists
         export NUM_OF_COLS_Table_A=$col1
         export NUM_OF_COLS_Table_B=$col2
