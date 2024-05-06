@@ -1,5 +1,5 @@
 #include "relcat.h"
-#include "static.h";
+#include "static.h"
 
 std::list<RelationCatalogEntry> RelationCatalog::catList;
 

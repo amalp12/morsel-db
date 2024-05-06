@@ -6,6 +6,7 @@
 #include <hsql/util/sqlhelper.h>
 #include <map>
 #include <queue>
+#include <numa.h>
 
 class QEP {
 public:

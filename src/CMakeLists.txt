@@ -12,6 +12,5 @@ elseif(CMAKE_BUILD_TYPE MATCHES "Release")
     # target_link_libraries(your_target_name optimized release_library_name)
 endif()
 
-target_link_libraries(dbapp numa)
+target_link_libraries(dbapp srclib numa)
 
-target_link_libraries(dbapp srclib )
