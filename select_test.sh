@@ -40,7 +40,7 @@ for ((cols = 3; cols <= 20; cols += 1)); do
     
     # ./compile_release.sh
 
-    for ((no_of_cores = 2; no_of_cores <= 48; no_of_cores += 2)); do
+    for ((no_of_cores = 1; no_of_cores <= 47; no_of_cores += 2)); do
         export NUM_OF_CORES=$no_of_cores
         for ((morselSize = row_size*10; morselSize <= row_size*100; morselSize += row_size)); do
         export MORSEL_SIZE_Table_$cols=$morselSize

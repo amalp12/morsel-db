@@ -54,7 +54,7 @@ int Morsel::setNthMorselEntry(int n, void *ptr,
   int offset = 0;
   for (auto iter = attributeList.begin(); iter != attributeList.end(); iter++) {
     Attribute attr = *iter;
-    memcpy((char *)(nthMorsel + offset), (char *)(ptr + attr.offset),
+    memcpy((void *)((char *)nthMorsel + offset), (void *)((char *)ptr + attr.offset),
            attr.size);
     offset += attr.size;
   }
