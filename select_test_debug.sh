@@ -25,13 +25,13 @@ fi
 echo "NUM_OF_CORE,MORSEL_SIZE,cols,recSize,TimeTaken" >> "$outputCSV"
 
 
-./compile_release.sh
+./compile.sh
 
-for ((no_of_cores = 2; no_of_cores <= 24; no_of_cores += 2)); do
+for ((no_of_cores = 4; no_of_cores <= 4; no_of_cores += 2)); do
 # for ((cols = 3; cols <= 20; cols += 1)); do   
     # ./compile_release.sh
     # for ((no_of_cores = 2; no_of_cores <= 48; no_of_cores += 2)); do
-    for ((cols = 3; cols <= 20; cols += 1)); do
+    for ((cols = 15; cols <= 15; cols += 1)); do
         file1="./Tables/Table_$cols.csv"
         export TABLE_NAME="Table_$cols"
         export NUM_OF_COLS_Table_$cols=$cols
@@ -46,7 +46,7 @@ for ((no_of_cores = 2; no_of_cores <= 24; no_of_cores += 2)); do
         export MORSEL_SIZE_Table_$cols=$morselSize
         export MORSEL_SIZE_TEMP=$morselSize
             # ./build-release/src/dbapp
-            ./build-release/src/dbapp
+            ./build/src/dbapp
             echo "/-------------------------------------MORSEL $morselSize COMPLETE -------------------------------------------/"
         done
     done

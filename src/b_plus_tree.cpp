@@ -555,7 +555,7 @@ template <typename T> int BPlusTree<T>::buildTree() {
   BPlusTree_LeafNode<T> *rootLeaf = new BPlusTree_LeafNode<T>();
 
   // get morsel head
-  Morsel *morselHead = this->relcat_entry->threadMap[this->coreNumber];
+  Morsel *morselHead = this->relcat_entry->getMorselHead(this->coreNumber);
 
   // iterate through all the morsels
   // iterate through all the records in the morsel

@@ -149,8 +149,8 @@ int QEP::handleNameSelect(int coreNum,
     // SELECT ID,Name,Age FROM test_table WHERE Age > 0;
 
     std::string tempTableName =  entry->getTableName() + "_temp";
-    relCat.insertNewTable(tempTableName, selectedColNameList,
-                          selectedColTypeList);
+    // relCat.insertNewTable(tempTableName, selectedColNameList,
+    //                       selectedColTypeList);
 
     RelationCatalogEntry *newEntry =
         RelationCatalog::getTableEntryRef(tempTableName);
@@ -304,8 +304,8 @@ int QEP::handleJoin(int coreNum, const hsql::SelectStatement *selectStatement) {
   }
 
   std::string tempTableName = "temp_join_result";
-  RELCAT.insertNewTable(tempTableName, selectedColNameList,
-                        selectedColTypeList);
+  // RELCAT.insertNewTable(tempTableName, selectedColNameList,
+  //                       selectedColTypeList);
 
   RelationCatalogEntry *newEntry =
       RelationCatalog::getTableEntryRef(tempTableName);

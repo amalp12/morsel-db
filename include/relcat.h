@@ -3,10 +3,10 @@
 #pragma once
 #include "attribute.h"
 #include "morsel.h"
+#include "test.h"
 #include <constants.h>
 #include <list>
 #include <map>
-#include "test.h"
 
 class RelationCatalogEntry {
 private:
@@ -24,6 +24,8 @@ public:
   std::string getTableName();
   std::list<Attribute> getAttributes();
   std::list<Attribute> *getAttributesRef();
+
+  Morsel *getMorselHead(int core);
 
   int setTableName(const std::string &name);
   int setAttributes(const std::list<std::string> &colNameList,

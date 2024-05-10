@@ -9,7 +9,7 @@ void *Tuple::getTupleValue(Attribute *attr, void *tuple) {
 // constructor
 
 TupleStream::TupleStream(RelationCatalogEntry *relEntry, int coreNum) {
-  this->morsel = relEntry->threadMap[coreNum];
+  this->morsel = relEntry->getMorselHead(coreNum);
   this->intitialMorsel = this->morsel;
 
   this->currentIndex = 0;

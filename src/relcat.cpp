@@ -87,10 +87,11 @@ int RelationCatalog::insertNewTable(const std::string &name,
     entrySize += iter->size;
   }
 
-  for (int coreNum = 1; coreNum <= staticVars.getNumberOfCores(); coreNum++) {
-    entry->threadMap[coreNum] =
-        new Morsel(entry->maxMorselSize, entrySize);
-  }
+  // for (int coreNum = 1; coreNum <= staticVars.getNumberOfCores(); coreNum++)
+  // {
+  //   entry->threadMap[coreNum] =
+  //       new Morsel(entry->maxMorselSize, entrySize);
+  // }
 
   // append to catList
   catList.emplace_back(*entry);
@@ -119,11 +120,12 @@ int RelationCatalog::insertNewTable(const std::string &name,
     entrySize += iter->size;
   }
 
-// alternate numa node id 
-  for (int coreNum = 1; coreNum <= staticVars.getNumberOfCores(); coreNum++) {
-    entry->threadMap[coreNum] =
-        new Morsel(entry->maxMorselSize, entrySize);
-  }
+  // alternate numa node id
+  // for (int coreNum = 1; coreNum <= staticVars.getNumberOfCores(); coreNum++)
+  // {
+  //   entry->threadMap[coreNum] =
+  //       new Morsel(entry->maxMorselSize, entrySize);
+  // }
 
   // append to catList
   catList.emplace_back(*entry);
@@ -200,7 +202,7 @@ int relcatInit() {
 
   std::list<std::string> colNameList;
   std::list<int> colTypeList;
-  std::map<int, void *> threadMap;
+  // std::map<int, void *> threadMap;
 
   colNameList.emplace_back("table_name");
   colNameList.emplace_back("column_name_list");
@@ -221,8 +223,33 @@ int RelationCatalog::appendToThreadMapMorsel(const std::string &tableName,
 
   for (auto iter = catList.begin(); iter != catList.end(); iter++) {
     if (tableName == iter->getTableName()) {
+
+      std::list<Attribute> attributeList = iter->getAttributes();
+
+      if (iter->threadMap[core] == nullptr) {
+        int entrySize = 0;
+        for (auto attrIter = attributeList.begin();
+             attrIter != attributeList.end(); attrIter++) {
+          entrySize += attrIter->size;
+        }
+
+        iter->threadMap[core] = new Morsel(iter->maxMorselSize, entrySize);
+      }
       iter->threadMap[core]->insertEntry(morselEntry);
     }
   }
   return 0;
+}
+
+Morsel *RelationCatalogEntry::getMorselHead(int core) {
+  if (this->threadMap[core] == nullptr) {
+    int entrySize = 0;
+    for (auto attrIter = attributeList.begin(); attrIter != attributeList.end();
+         attrIter++) {
+      entrySize += attrIter->size;
+    }
+
+    this->threadMap[core] = new Morsel(this->maxMorselSize, entrySize);
+  }
+  return this->threadMap[core];
 }
