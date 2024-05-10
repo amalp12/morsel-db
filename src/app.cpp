@@ -12,7 +12,6 @@
 #include <thread>
 #include <fstream>
 #include <iomanip>
-#include <numa.h>
 
 void initializeJoinHash(const hsql::SelectStatement *selectStatement,
                         std::string table1, std::string table2) {
@@ -45,7 +44,7 @@ int main(int argc, char **argv) {
     StaticVars staticVars;
     // staticVars.setMaxMorselSize(std::stoi(get_env_var("MORSEL_SIZE")));
     staticVars.setNumberOfCores(std::stoi(get_env_var("NUM_OF_CORES")));
-
+    std::string table1,table2;
   int coreNum = 1;
   // create staticVars
   // StaticVars staticVars;
@@ -55,15 +54,11 @@ int main(int argc, char **argv) {
 
 
     while (true) {
-        std::string table = "test_table";
-        std::string table1 = "Table_A";
-        std::string table2 = "Table_B";
-        create_table_test_random(table1);
-        create_table_test_random(table2);
-        // create_table_test_random(table);
+        std::string table = get_env_var("TABLE_NAME");
+        create_table_test_random(table);
 
         try {
-            const std::string outputCSV = "./outputlog_join.csv";
+            const std::string outputCSV = "./outputlog_select.csv";
             std::ofstream output(outputCSV.c_str(), std::ios_base::app);
 
             std::string query = get_env_var("QUERY");
@@ -99,28 +94,28 @@ int main(int argc, char **argv) {
                             timeArr[t_no] = qep.execute(t_no + 1);
                         });
                     }
+                    
 
                     res = 0;
+              
                     for (int t_no = 0; t_no < staticVars.getNumberOfCores(); t_no++) {
                         threads[t_no].join();
                         res += timeArr[t_no];
                     }
+                    
                     res /= staticVars.getNumberOfCores();
                 } else {
                     res = qep.execute(1); // Assuming coreNum is not used elsewhere
                 }
 
-                int cols1 = std::stoi(get_env_var("NUM_OF_COLS_" + table1));
-                int cols2 = std::stoi(get_env_var("NUM_OF_COLS_" + table2));
+                int cols = std::stoi(get_env_var("NUM_OF_COLS_" + table));
+                
                 
 
                 output << staticVars.getNumberOfCores() 
-                << "," << std::stoi(get_env_var("MORSEL_SIZE_" + table1)) 
-                << "," << std::stoi(get_env_var("MORSEL_SIZE_" + table2)) 
-                << "," << std::stoi(get_env_var("NUM_OF_COLS_" + table1)) 
-                << "," << std::stoi(get_env_var("NUM_OF_COLS_" + table2)) 
-                << "," << std::stoi(get_env_var("row_size_A"))
-                << "," << std::stoi(get_env_var("row_size_B"))
+                << "," << std::stoi(get_env_var("MORSEL_SIZE_" + table)) 
+                << "," << std::stoi(get_env_var("NUM_OF_COLS_" + table)) 
+                << "," << std::stoi(get_env_var("row_size"))
                 << "," << std::fixed << std::setprecision(5) << res << std::endl;
                 }
 

@@ -60,12 +60,12 @@ int main(int argc, char **argv) {
         create_table_test_random(table1);
         create_table_test_random(table2);
         // create_table_test_random(table);
+        const std::string outputCSV = get_env_var("ROOTDIR") + "/outputlog_join.csv";
+        std::ofstream output(outputCSV.c_str(), std::ios_base::app);
+        std::string query = get_env_var("QUERY");
 
         try {
-            const std::string outputCSV = "./outputlog_join.csv";
-            std::ofstream output(outputCSV.c_str(), std::ios_base::app);
 
-            std::string query = get_env_var("QUERY");
             if (query == "exit" || query == "quit") {
                 std::cout << "Exiting...\n";
                 break;

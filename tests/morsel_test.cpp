@@ -12,7 +12,7 @@
 static void test(int argc, char **argv) {
   // staticvars
   StaticVars staticVars;
-  std::string tableName = "test_table";
+  std::string tableName = get_env_var("TABLE_NAME");
   int coreNum = 1;
   const int total_cores = 48;
   std::array<int, 7> morsel_sizes{26400000, 13200000, 2640000, 1320000,

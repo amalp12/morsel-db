@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
     StaticVars staticVars;
     // staticVars.setMaxMorselSize(std::stoi(get_env_var("MORSEL_SIZE")));
     staticVars.setNumberOfCores(std::stoi(get_env_var("NUM_OF_CORES")));
-
+    std::string table1,table2;
   int coreNum = 1;
   // create staticVars
   // StaticVars staticVars;
@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
 
 
     while (true) {
-        std::string table = "test_table";
+        std::string table = get_env_var("TABLE_NAME");
         create_table_test_random(table);
 
         try {
@@ -96,7 +96,11 @@ int main(int argc, char **argv) {
                     }
 
                     res = 0;
-                    for (int t_no = 0; t_no < staticVars.getNumberOfCores(); t_no++) {
+                    // for (int t_no = 0; t_no < staticVars.getNumberOfCores(); t_no++) {
+                    //     threads[t_no].join();
+                    //     res += timeArr[t_no];
+                    // }
+                    for (int t_no = 0; t_no < 1; t_no++) {
                         threads[t_no].join();
                         res += timeArr[t_no];
                     }

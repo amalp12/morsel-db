@@ -29,7 +29,7 @@ void initMorsel(int core, std::string tableName, int start_index,
   RelationCatalog relCat;
   Row *destination = new Row();
   std::string codebase = get_env_var("ROOTDIR");
-  std::ifstream file(codebase + "/in/test_table.csv");
+  std::ifstream file(codebase + "/in/" + get_env_var("TABLE_NAME") + " .csv");
 
   if (!file.is_open()) {
     std::cerr << "Failed to open file!" << std::endl;
@@ -82,7 +82,7 @@ int create_table_test() {
 
   RelationCatalog relCat;
   // SELECT Name FROM test_table WHERE Age > 25;
-  std::string tableName = "test_table";
+  std::string tableName = get_env_var("TABLE_NAME");
   std::list<std::string> colNameList = {"ID", "Name", "Age"};
   std::list<int> colTypeList = {INTEGER, STRING, INTEGER};
   relCat.insertNewTable(tableName, colNameList, colTypeList);
@@ -90,7 +90,7 @@ int create_table_test() {
   // initMorsel(0 , tableName);
   // Create threads
   std::vector<std::thread> threads;
-  std::string filename = get_env_var("ROOTDIR") + "/in/test_table.csv";
+  std::string filename = get_env_var("ROOTDIR") + "/in/" + get_env_var("TABLE_NAME") + ".csv";
 
   std::ifstream file(filename);
   int total_lines = std::count(std::istreambuf_iterator<char>(file),
@@ -157,7 +157,7 @@ int create_table_test_random(std::string tableName) {
   // initMorsel(0 , tableName);
   // Create threads
   std::vector<std::thread> threads;
-  std::string filename = get_env_var("ROOTDIR") + "/in/" + tableName + ".csv";
+  std::string filename = get_env_var("ROOTDIR") + "/Tables/" + tableName + ".csv";
   std::ifstream file(filename);
   auto endBuff = std::istreambuf_iterator<char>();
   auto fileBuff = std::istreambuf_iterator<char>(file);
@@ -198,11 +198,11 @@ void initMorselRandom(int core, std::string tableName, int start_index,
   int integerAttr;
   char stringAttr[STRING_SIZE] = {'\0'};
 
-  std::string filename = get_env_var("ROOTDIR") + "/in/" + tableName + ".csv";
+  std::string filename = get_env_var("ROOTDIR") + "/Tables/" + tableName + ".csv";
   std::ifstream file(filename);
 
   if (!file.is_open()) {
-    std::cerr << "Failed to open file!" << std::endl;
+    std::cerr << "Failed to open file!  " << filename <<std::endl;
     return;
   }
 
@@ -245,7 +245,7 @@ void initMorselRandom(int core, std::string tableName, int start_index,
 
 int insertRowsRandom(std::list<int> colTypeList, std::string tableName) {
 
-  std::string filename = get_env_var("ROOTDIR") + "/in/" + tableName + ".csv";
+  std::string filename = get_env_var("ROOTDIR") + "/Tables/" + tableName + ".csv";
   std::ofstream outFile(filename, std::ios_base::out);
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -355,7 +355,7 @@ void loadPrevTable() {
 
   // Create threads
   std::vector<std::thread> threads;
-  std::string filename = get_env_var("ROOTDIR") + "/in/" + tableName + ".csv";
+  std::string filename = get_env_var("ROOTDIR") + "/Tables/" + tableName + ".csv";
   std::ifstream file(filename);
   int total_lines = std::count(std::istreambuf_iterator<char>(file),
                                std::istreambuf_iterator<char>(), '\n');
