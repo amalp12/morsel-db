@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Define the file names
-outputCSV="./outputlog_select.csv"
+outputCSV="./outputlog_select_3.csv"
 
 # Generate random numbers for rows and columns
-rows=48000
+rows=480000
 int_size=4
 str_size=256
 row_size=0
@@ -27,7 +27,7 @@ echo "NUM_OF_CORE,MORSEL_SIZE,cols,recSize,TimeTaken" >> "$outputCSV"
 
 ./compile_release.sh
 
-for ((no_of_cores = 2; no_of_cores <= 24; no_of_cores += 2)); do
+for ((no_of_cores = 16; no_of_cores <= 32; no_of_cores += 2)); do
 # for ((cols = 3; cols <= 20; cols += 1)); do   
     # ./compile_release.sh
     # for ((no_of_cores = 2; no_of_cores <= 48; no_of_cores += 2)); do
@@ -42,11 +42,11 @@ for ((no_of_cores = 2; no_of_cores <= 24; no_of_cores += 2)); do
         export NUM_OF_RECS_Table_$cols=$rows
         export NUM_OF_CORES=$no_of_cores
 
-        for ((morselSize = row_size*10; morselSize <= row_size*100; morselSize += row_size)); do
+        for ((morselSize = row_size*10; morselSize <= row_size*100000; morselSize += (100 * row_size))); do
         export MORSEL_SIZE_Table_$cols=$morselSize
         export MORSEL_SIZE_TEMP=$morselSize
-            # ./build-release/src/dbapp
             ./build-release/src/dbapp
+            # ./build-release/src/dbapp
             echo "/-------------------------------------MORSEL $morselSize COMPLETE -------------------------------------------/"
         done
     done

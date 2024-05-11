@@ -49,7 +49,6 @@ QEP::QEP() {
 }
 
 int QEP::handleCreateTable(int coreNum) {
-  RelationCatalog relCat;
   const hsql::CreateStatement *createStatement =
       static_cast<const hsql::CreateStatement *>(statement);
 
@@ -73,7 +72,7 @@ int QEP::handleCreateTable(int coreNum) {
       std::cout << column << '\n';
   }
 
-  return relCat.insertNewTable(tableName, colNameList, colTypeList);
+  return RelationCatalog::insertNewTable(tableName, colNameList, colTypeList);
 }
 
 int QEP::handleNameSelect(int coreNum,
@@ -145,11 +144,10 @@ int QEP::handleNameSelect(int coreNum,
     }
 
     // create a new table
-    RelationCatalog relCat;
     // SELECT ID,Name,Age FROM test_table WHERE Age > 0;
 
-    std::string tempTableName =  entry->getTableName() + "_temp";
-    // relCat.insertNewTable(tempTableName, selectedColNameList,
+    std::string tempTableName = entry->getTableName() + "_temp";
+    // RelationCatalog::insertNewTable(tempTableName, selectedColNameList,
     //                       selectedColTypeList);
 
     RelationCatalogEntry *newEntry =
@@ -363,7 +361,8 @@ int QEP::handleJoin(int coreNum, const hsql::SelectStatement *selectStatement) {
 
   Operator::loop(fn_join_loop, args, JOIN_FN_IDENTIFIER);
 
-  std::string output_file_name = get_env_var("ROOTDIR") + "/out/temp_join_result_" +
+  std::string output_file_name = get_env_var("ROOTDIR") +
+                                 "/out/temp_join_result_" +
                                  std::to_string(coreNum) + ".csv";
 
   // reset the output tuple stream
@@ -403,7 +402,6 @@ int QEP::handleSelect(int coreNum) {
 }
 
 int QEP::handleInsert(int coreNum) {
-  RelationCatalog relCat;
 
   const hsql::InsertStatement *insertStatement =
       static_cast<const hsql::InsertStatement *>(statement);
@@ -446,7 +444,7 @@ int QEP::handleInsert(int coreNum) {
   }
 
   // Append to thread map morsel
-  relCat.appendToThreadMapMorsel(tableName, coreNum, destination);
+  RelationCatalog::appendToThreadMapMorsel(tableName, coreNum, destination);
 
   // Clean up allocated memory
   delete[] destination;
@@ -458,8 +456,8 @@ int QEP::handleInsert(int coreNum) {
 int QEP::execute(int coreNum) {
   // Get the current time before running the program
   StaticVars st;
-  int currNode = st.getNumaID(coreNum -1);
-  if (coreNum > 1 &&  currNode >= 0 ) {
+  int currNode = st.getNumaID(coreNum - 1);
+  if (coreNum > 1 && currNode >= 0) {
     if (numa_run_on_node(currNode) < 0) {
       fprintf(stderr, "Error message: %s\n", strerror(errno));
       std::cout << "Not possible" << '\n';

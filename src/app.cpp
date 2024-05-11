@@ -15,7 +15,6 @@
 
 void create_output_table(const hsql::SelectStatement *selectStatement,
                          std::string table1, std::string table2) {
-  RelationCatalog relCat;
   if (table2 == "") {
     RelationCatalogEntry *entry = RelationCatalog::getTableEntryRef(table1);
     const auto columnslist = entry->getAttributes();
@@ -36,8 +35,8 @@ void create_output_table(const hsql::SelectStatement *selectStatement,
         }
       }
       std::string tempTableName = entry->getTableName() + "_temp";
-      relCat.insertNewTable(tempTableName, selectedColNameList,
-                            selectedColTypeList);
+      RelationCatalog::insertNewTable(tempTableName, selectedColNameList,
+                                      selectedColTypeList);
     }
 
   }
@@ -87,8 +86,8 @@ void create_output_table(const hsql::SelectStatement *selectStatement,
     }
 
     std::string tempTableName = "temp_join_result";
-    relCat.insertNewTable(tempTableName, selectedColNameList,
-                          selectedColTypeList);
+    RelationCatalog::insertNewTable(tempTableName, selectedColNameList,
+                                    selectedColTypeList);
   }
 }
 
@@ -125,16 +124,14 @@ void initializeJoinHash(const hsql::SelectStatement *selectStatement,
 }
 
 int main(int argc, char **argv) {
-  StaticVars staticVars;
-  // staticVars.setMaxMorselSize(std::stoi(get_env_var("MORSEL_SIZE")));
-  staticVars.setNumberOfCores(std::stoi(get_env_var("NUM_OF_CORES")));
+  // StaticVars::setMaxMorselSize(std::stoi(get_env_var("MORSEL_SIZE")));
+  StaticVars::setNumberOfCores(std::stoi(get_env_var("NUM_OF_CORES")));
   std::string table1, table2;
   int coreNum = 1;
-  // create staticVars
-  // StaticVars staticVars;
+
   // set cores and morsel size
-  // staticVars.setNumberOfCores(std::stoi(get_env_var("NUM_OF_CORES")));
-  // staticVars.setNumberOfCores(4);
+  // StaticVars::setNumberOfCores(std::stoi(get_env_var("NUM_OF_CORES")));
+  // StaticVars::setNumberOfCores(4);
 
   while (true) {
     std::string table = get_env_var("TABLE_NAME");
@@ -173,10 +170,10 @@ int main(int argc, char **argv) {
 
         float res;
         if (isStatementMultithread(statement->type())) {
-          std::vector<int> timeArr(staticVars.getNumberOfCores());
+          std::vector<int> timeArr(StaticVars::getNumberOfCores());
 
-          std::vector<std::thread> threads(staticVars.getNumberOfCores());
-          for (int t_no = 0; t_no < staticVars.getNumberOfCores(); t_no++) {
+          std::vector<std::thread> threads(StaticVars::getNumberOfCores());
+          for (int t_no = 0; t_no < StaticVars::getNumberOfCores(); t_no++) {
             threads[t_no] = std::thread([&timeArr, &qep, t_no]() {
               timeArr[t_no] = qep.execute(t_no + 1);
             });
@@ -184,19 +181,19 @@ int main(int argc, char **argv) {
 
           res = 0;
 
-          for (int t_no = 0; t_no < staticVars.getNumberOfCores(); t_no++) {
+          for (int t_no = 0; t_no < StaticVars::getNumberOfCores(); t_no++) {
             threads[t_no].join();
             res += timeArr[t_no];
           }
 
-          res /= staticVars.getNumberOfCores();
+          res /= StaticVars::getNumberOfCores();
         } else {
           res = qep.execute(1); // Assuming coreNum is not used elsewhere
         }
 
         int cols = std::stoi(get_env_var("NUM_OF_COLS_" + table));
 
-        output << staticVars.getNumberOfCores() << ","
+        output << StaticVars::getNumberOfCores() << ","
                << std::stoi(get_env_var("MORSEL_SIZE_" + table)) << ","
                << std::stoi(get_env_var("NUM_OF_COLS_" + table)) << ","
                << std::stoi(get_env_var("row_size")) << "," << std::fixed
@@ -285,13 +282,12 @@ int main(int argc, char **argv) {
 // int main(int argc, char **argv) {
 
 //   int coreNum = 1;
-//   // create staticVars
-//   StaticVars staticVars;
+
 //   // set cores and morsel size
-//   // staticVars.setNumberOfCores(4);
-//   staticVars.setMaxMorselSize(std::stoi(get_env_var("MORSEL_SIZE")));
-//   staticVars.setNumberOfCores(std::stoi(get_env_var("NUM_OF_CORES")));
-//   // staticVars.setMaxMorselSize(10000);
+//   // StaticVars::setNumberOfCores(4);
+//   StaticVars::setMaxMorselSize(std::stoi(get_env_var("MORSEL_SIZE")));
+//   StaticVars::setNumberOfCores(std::stoi(get_env_var("NUM_OF_CORES")));
+//   // StaticVars::setMaxMorselSize(10000);
 //   // create_table_test();
 //   while (true) {
 //     // create_table_test();
@@ -315,7 +311,7 @@ int main(int argc, char **argv) {
 //       std::endl;
 
 //       // SELECT Name, ID, Age from test_table WHERE Age > 0;
-//       int numberOfCores = staticVars.getNumberOfCores();
+//       int numberOfCores = StaticVars::getNumberOfCores();
 //       std::string query;
 //       float res;
 //       std::array<int, 48> timeArr;
@@ -355,10 +351,10 @@ int main(int argc, char **argv) {
 //           //  create_table_test();
 //           // create 4 threads and call exicute on each
 //           //  std::list<std::thread> threads;
-//           std::vector<std::thread> threads(staticVars.getNumberOfCores());
+//           std::vector<std::thread> threads(StaticVars::getNumberOfCores());
 
 //             // Launch threads
-//             for (int t_no = 0; t_no < staticVars.getNumberOfCores(); t_no++)
+//             for (int t_no = 0; t_no < StaticVars::getNumberOfCores(); t_no++)
 //             {
 //               threads[t_no] = std::thread(
 //                   [&timeArr, &qep,
@@ -369,13 +365,13 @@ int main(int argc, char **argv) {
 //             // reset res
 //             res = 0;
 //             // Join threads
-//             for (int t_no = 0; t_no < staticVars.getNumberOfCores(); t_no++)
+//             for (int t_no = 0; t_no < StaticVars::getNumberOfCores(); t_no++)
 //             {
 //               threads[t_no].join();
 //               res += timeArr[t_no];
 //             }
 //             // divide res by the number of cores
-//             res /= staticVars.getNumberOfCores();
+//             res /= StaticVars::getNumberOfCores();
 //         }
 
 //         else {
@@ -388,8 +384,8 @@ int main(int argc, char **argv) {
 //         int row_size = ceil_cols * 4 + floor_cols * 256;
 
 //         coreNum = (coreNum + 1) % numberOfCores;
-//         output <<  staticVars.getNumberOfCores() << "," <<
-//         staticVars.getMaxMorselSize() << "," << cols << "," <<  row_size <<
+//         output <<  StaticVars::getNumberOfCores() << "," <<
+//         StaticVars::getMaxMorselSize() << "," << cols << "," <<  row_size <<
 //         ","  << res << std::endl;
 //       }
 

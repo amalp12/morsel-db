@@ -73,8 +73,7 @@ int RelationCatalogEntry::setAttributes(
 
 int RelationCatalog::insertNewTable(const std::string &name,
                                     const std::list<Attribute> &attrs) {
-  // staticvars
-  StaticVars staticVars;
+
   // create new relations cat entry
   RelationCatalogEntry *entry = new RelationCatalogEntry();
 
@@ -87,11 +86,9 @@ int RelationCatalog::insertNewTable(const std::string &name,
     entrySize += iter->size;
   }
 
-  // for (int coreNum = 1; coreNum <= staticVars.getNumberOfCores(); coreNum++)
-  // {
-  //   entry->threadMap[coreNum] =
-  //       new Morsel(entry->maxMorselSize, entrySize);
-  // }
+  for (int coreNum = 1; coreNum <= StaticVars::getNumberOfCores(); coreNum++) {
+    entry->threadMap[coreNum] = nullptr;
+  }
 
   // append to catList
   catList.emplace_back(*entry);
@@ -103,8 +100,7 @@ int RelationCatalog::insertNewTable(const std::string &name,
 int RelationCatalog::insertNewTable(const std::string &name,
                                     const std::list<std::string> &colNameList,
                                     const std::list<int> &colTypeList) {
-  // staticvars
-  StaticVars staticVars;
+
   // create new relations cat entry
   RelationCatalogEntry *entry = new RelationCatalogEntry();
 
@@ -114,18 +110,10 @@ int RelationCatalog::insertNewTable(const std::string &name,
   std::string env = get_env_var("MORSEL_SIZE_TEMP");
   entry->maxMorselSize = std::stoi(env);
 
-  std::list<Attribute> attributeList = entry->getAttributes();
-  int entrySize = 0;
-  for (auto iter = attributeList.begin(); iter != attributeList.end(); iter++) {
-    entrySize += iter->size;
-  }
-
   // alternate numa node id
-  // for (int coreNum = 1; coreNum <= staticVars.getNumberOfCores(); coreNum++)
-  // {
-  //   entry->threadMap[coreNum] =
-  //       new Morsel(entry->maxMorselSize, entrySize);
-  // }
+  for (int coreNum = 1; coreNum <= StaticVars::getNumberOfCores(); coreNum++) {
+    entry->threadMap[coreNum] = nullptr;
+  }
 
   // append to catList
   catList.emplace_back(*entry);
@@ -151,9 +139,8 @@ int RelationCatalog::getTableEntry(const std::string &tableName,
 
 void RelationCatalogEntry::clearEntry() {
   tableName.clear();
-  // decalre static vars and get number of cores
-  StaticVars staticVars;
-  int numCores = staticVars.getNumberOfCores();
+
+  int numCores = StaticVars::getNumberOfCores();
   // for each entry in attirbuteList
   for (auto &attr : attributeList) {
     attr.name.clear();

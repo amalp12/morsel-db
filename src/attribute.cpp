@@ -25,9 +25,7 @@ bool BPlusTreeContainer::isIndexedForCoreNumber(int coreNumber) {
 
 BPlusTreeContainer::BPlusTreeContainer(std::string tableName) {
 
-  StaticVars staticVars;
-
-  this->size = staticVars.getNumberOfCores();
+  this->size = StaticVars::getNumberOfCores();
 
   // create bPlusTreeRef array of size equal to number of cores and initialize
   // to NULL

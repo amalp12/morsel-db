@@ -10,8 +10,7 @@
 #include <thread>
 
 static void test(int argc, char **argv) {
-  // staticvars
-  StaticVars staticVars;
+
   std::string tableName = get_env_var("TABLE_NAME");
   int coreNum = 1;
   const int total_cores = 48;
@@ -25,12 +24,12 @@ static void test(int argc, char **argv) {
     const hsql::SQLStatement *statement = result.getStatement(0);
     // parseSelectStatement(statement);
     for (auto &morsel_size : morsel_sizes) {
-      staticVars.setMaxMorselSize(morsel_size);
+      StaticVars::setMaxMorselSize(morsel_size);
       // std::cout << "Morsel size:: " << morsel_size << '\n';
 
       for (int i = 1; i <= total_cores; i++) {
         const int avg_num = 3;
-        staticVars.setNumberOfCores(i);
+        StaticVars::setNumberOfCores(i);
         std::array<float, avg_num> res;
 
         // create_table_test();
@@ -51,10 +50,10 @@ static void test(int argc, char **argv) {
           if (isStatementMultithread(statement->type())) {
             //  create_table_test();
             // create 4 threads and call exicute on each
-            std::vector<std::thread> threads(staticVars.getNumberOfCores());
+            std::vector<std::thread> threads(StaticVars::getNumberOfCores());
 
             // Launch threads
-            for (int t_no = 0; t_no < staticVars.getNumberOfCores(); t_no++) {
+            for (int t_no = 0; t_no < StaticVars::getNumberOfCores(); t_no++) {
               threads[t_no] = std::thread(
                   [&timeArr, &qep,
                    t_no]() { // Capture timeArr in the lambda capture list
@@ -64,19 +63,19 @@ static void test(int argc, char **argv) {
             // reset res
             res[t] = 0;
             // Join threads
-            for (int t_no = 0; t_no < staticVars.getNumberOfCores(); t_no++) {
+            for (int t_no = 0; t_no < StaticVars::getNumberOfCores(); t_no++) {
               threads[t_no].join();
               res[t] += timeArr[t_no];
             }
             // divide res by the number of cores
-            res[t] /= staticVars.getNumberOfCores();
+            res[t] /= StaticVars::getNumberOfCores();
           }
 
           else {
             res[t] = qep.execute(coreNum);
           }
 
-          coreNum = (coreNum + 1) % staticVars.getNumberOfCores();
+          coreNum = (coreNum + 1) % StaticVars::getNumberOfCores();
           destructRelcat();
         }
         std::cout << i << ", " << morsel_size << ", " << table_size << ", "

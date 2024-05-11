@@ -12,8 +12,7 @@
 void destructRelcat() {
   // create recat object
 
-  RelationCatalog relCat;
-  relCat.deleteRelcat();
+  RelationCatalog::deleteRelcat();
 }
 std::string get_env_var(std::string const &key) {
   char *val;
@@ -26,7 +25,7 @@ std::string get_env_var(std::string const &key) {
 }
 void initMorsel(int core, std::string tableName, int start_index,
                 int end_index) {
-  RelationCatalog relCat;
+
   Row *destination = new Row();
   std::string codebase = get_env_var("ROOTDIR");
   std::ifstream file(codebase + "/in/" + get_env_var("TABLE_NAME") + " .csv");
@@ -70,35 +69,33 @@ void initMorsel(int core, std::string tableName, int start_index,
     record.age = age;
 
     memcpy(destination, &record, sizeof(Row));
-    relCat.appendToThreadMapMorsel(tableName, core, destination);
+    RelationCatalog::appendToThreadMapMorsel(tableName, core, destination);
   }
 
   delete destination;
 }
 
 int create_table_test() {
-  // staticvars
-  StaticVars staticVars;
 
-  RelationCatalog relCat;
   // SELECT Name FROM test_table WHERE Age > 25;
   std::string tableName = get_env_var("TABLE_NAME");
   std::list<std::string> colNameList = {"ID", "Name", "Age"};
   std::list<int> colTypeList = {INTEGER, STRING, INTEGER};
-  relCat.insertNewTable(tableName, colNameList, colTypeList);
+  RelationCatalog::insertNewTable(tableName, colNameList, colTypeList);
 
   // initMorsel(0 , tableName);
   // Create threads
   std::vector<std::thread> threads;
-  std::string filename = get_env_var("ROOTDIR") + "/in/" + get_env_var("TABLE_NAME") + ".csv";
+  std::string filename =
+      get_env_var("ROOTDIR") + "/in/" + get_env_var("TABLE_NAME") + ".csv";
 
   std::ifstream file(filename);
   int total_lines = std::count(std::istreambuf_iterator<char>(file),
                                std::istreambuf_iterator<char>(), '\n');
-  int lines_per_thread = total_lines / staticVars.getNumberOfCores();
+  int lines_per_thread = total_lines / StaticVars::getNumberOfCores();
 
   // Launch threads
-  for (int i = 0; i < staticVars.getNumberOfCores(); i++) {
+  for (int i = 0; i < StaticVars::getNumberOfCores(); i++) {
     int start_line = lines_per_thread * i + 1;
 
     int end_line = start_line + lines_per_thread - 1;
@@ -108,7 +105,7 @@ int create_table_test() {
   }
 
   // Join threads
-  for (int i = 0; i < staticVars.getNumberOfCores(); i++) {
+  for (int i = 0; i < StaticVars::getNumberOfCores(); i++) {
     threads[i].join();
   }
   return 0;
@@ -117,8 +114,7 @@ int create_table_test() {
 int create_table_test_random(std::string tableName) {
   // SELECT Table_A.Column_2_Table_A , Table_B.Column_2_Table_B FROM Table_A
   // INNER JOIN Table_B ON Table_A.Column_2_Table_A = Table_B.Column_2_Table_B;
-  // staticvars
-  StaticVars staticVars;
+
   std::list<std::string> colNameList;
   std::list<int> colTypeList;
 
@@ -127,7 +123,6 @@ int create_table_test_random(std::string tableName) {
   // std::mt19937 gen(rd());
   // std::uniform_int_distribution<int> dist(3, 7);
   int numColumns = std::stoi(get_env_var("NUM_OF_COLS_" + tableName));
-  RelationCatalog relCat;
 
   for (int col = 0; col < numColumns; ++col) {
     colNameList.push_back("Column_" + std::to_string(col + 1) + "_" +
@@ -152,20 +147,21 @@ int create_table_test_random(std::string tableName) {
 
   insertRowsRandom(colTypeList, tableName);
 
-  relCat.insertNewTable(tableName, colNameList, colTypeList);
+  RelationCatalog::insertNewTable(tableName, colNameList, colTypeList);
 
   // initMorsel(0 , tableName);
   // Create threads
   std::vector<std::thread> threads;
-  std::string filename = get_env_var("ROOTDIR") + "/Tables/" + tableName + ".csv";
+  std::string filename =
+      get_env_var("ROOTDIR") + "/Tables/" + tableName + ".csv";
   std::ifstream file(filename);
   auto endBuff = std::istreambuf_iterator<char>();
   auto fileBuff = std::istreambuf_iterator<char>(file);
   int total_lines = std::count(fileBuff, endBuff, '\n');
-  int lines_per_thread = total_lines / staticVars.getNumberOfCores();
+  int lines_per_thread = total_lines / StaticVars::getNumberOfCores();
 
   // Launch threads
-  for (int i = 0; i < staticVars.getNumberOfCores(); i++) {
+  for (int i = 0; i < StaticVars::getNumberOfCores(); i++) {
     int start_line = lines_per_thread * i + 1;
 
     int end_line = start_line + lines_per_thread - 1;
@@ -176,7 +172,7 @@ int create_table_test_random(std::string tableName) {
   }
 
   // Join threads
-  for (int i = 0; i < staticVars.getNumberOfCores(); i++) {
+  for (int i = 0; i < StaticVars::getNumberOfCores(); i++) {
     threads[i].join();
   }
   return 0;
@@ -184,9 +180,8 @@ int create_table_test_random(std::string tableName) {
 
 void initMorselRandom(int core, std::string tableName, int start_index,
                       int end_index) {
-  RelationCatalog relCat;
   RelationCatalogEntry *entry = new RelationCatalogEntry();
-  relCat.getTableEntry(tableName, entry);
+  RelationCatalog::getTableEntry(tableName, entry);
   std::list<Attribute> attributeList = entry->getAttributes();
 
   int entrySize = 0;
@@ -198,11 +193,12 @@ void initMorselRandom(int core, std::string tableName, int start_index,
   int integerAttr;
   char stringAttr[STRING_SIZE] = {'\0'};
 
-  std::string filename = get_env_var("ROOTDIR") + "/Tables/" + tableName + ".csv";
+  std::string filename =
+      get_env_var("ROOTDIR") + "/Tables/" + tableName + ".csv";
   std::ifstream file(filename);
 
   if (!file.is_open()) {
-    std::cerr << "Failed to open file!  " << filename <<std::endl;
+    std::cerr << "Failed to open file!  " << filename << std::endl;
     return;
   }
 
@@ -236,7 +232,7 @@ void initMorselRandom(int core, std::string tableName, int start_index,
       }
     }
 
-    relCat.appendToThreadMapMorsel(tableName, core, destination);
+    RelationCatalog::appendToThreadMapMorsel(tableName, core, destination);
   }
 
   delete[] destination;
@@ -245,7 +241,8 @@ void initMorselRandom(int core, std::string tableName, int start_index,
 
 int insertRowsRandom(std::list<int> colTypeList, std::string tableName) {
 
-  std::string filename = get_env_var("ROOTDIR") + "/Tables/" + tableName + ".csv";
+  std::string filename =
+      get_env_var("ROOTDIR") + "/Tables/" + tableName + ".csv";
   std::ofstream outFile(filename, std::ios_base::out);
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -293,8 +290,6 @@ void createTableMetaAndRows(std::string tableName) {
   std::mt19937 gen(rd());
   std::uniform_int_distribution<int> dist(3, 7);
   int numColumns = dist(gen);
-
-  RelationCatalog relCat;
 
   for (int col = 0; col < numColumns; ++col) {
     colNameList.push_back("Column_" + std::to_string(col + 1) + "_" +
@@ -349,20 +344,19 @@ void loadPrevTable() {
     }
   }
 
-  RelationCatalog relCat;
-  StaticVars staticVars;
-  relCat.insertNewTable(tableName, colNameList, colTypeList);
+  RelationCatalog::insertNewTable(tableName, colNameList, colTypeList);
 
   // Create threads
   std::vector<std::thread> threads;
-  std::string filename = get_env_var("ROOTDIR") + "/Tables/" + tableName + ".csv";
+  std::string filename =
+      get_env_var("ROOTDIR") + "/Tables/" + tableName + ".csv";
   std::ifstream file(filename);
   int total_lines = std::count(std::istreambuf_iterator<char>(file),
                                std::istreambuf_iterator<char>(), '\n');
-  int lines_per_thread = total_lines / staticVars.getNumberOfCores();
+  int lines_per_thread = total_lines / StaticVars::getNumberOfCores();
 
   // Launch threads
-  for (int i = 0; i < staticVars.getNumberOfCores(); i++) {
+  for (int i = 0; i < StaticVars::getNumberOfCores(); i++) {
     int start_line = lines_per_thread * i + 1;
 
     int end_line = start_line + lines_per_thread - 1;
@@ -373,7 +367,7 @@ void loadPrevTable() {
   }
 
   // Join threads
-  for (int i = 0; i < staticVars.getNumberOfCores(); i++) {
+  for (int i = 0; i < StaticVars::getNumberOfCores(); i++) {
     threads[i].join();
   }
 }
