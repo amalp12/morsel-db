@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the file names
-outputCSV="./outputlog_select_3.csv"
+outputCSV="./outputlog_select.csv"
 
 # Generate random numbers for rows and columns
 rows=480000
